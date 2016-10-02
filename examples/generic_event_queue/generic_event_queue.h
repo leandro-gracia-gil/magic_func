@@ -197,7 +197,7 @@ class GenericEventQueue {
     // In C++11 the arguments tuple is copied. In C++14 is moved, so it is
     // also possible to store move-only arguments and rvalue references.
     std::lock_guard<std::recursive_mutex> lock(mutex_);
-    event_queue_.emplace_back(std::make_pair(
+    auto event_pair = std::make_pair(
         reinterpret_cast<void*>(event),
 #if __cplusplus < 201402L
         // In C++11 we copy the argument tuple after conversion.
@@ -213,7 +213,14 @@ class GenericEventQueue {
           // type does not match, which should never be the case.
           auto& f = mf::FunctionCast<FunctionType<FuncPtr>>(type_erased);
           Invoke(f, args_tuple, std::index_sequence_for<Args_...>());
-        }));
+        });
+
+    // Inserting the event into the queue during a dispatch invalidates
+    // all iterators. In that case we add them when dispatch finishes.
+    if (current_dispatch_event_)
+      events_enqueued_during_dispatch_.emplace_back(std::move(event_pair));
+    else
+      event_queue_.emplace_back(std::move(event_pair));
   }
 
   // Dispatches any enqueued events to their corresponding listeners.
@@ -276,6 +283,7 @@ class GenericEventQueue {
   // Used to avoid reentrant code issues during dispatch.
   void* current_dispatch_event_;
   bool listeners_removed_during_dispatch_;
+  std::list<Event> events_enqueued_during_dispatch_;
 };
 
 #endif  // MAGIC_FUNC_EXAMPLES_GENERIC_EVENT_QUEUE_GENERIC_EVENT_QUEUE_H_

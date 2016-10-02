@@ -94,9 +94,9 @@ bool GenericEventQueue::Dispatch() {
   if (current_dispatch_event_ != nullptr)
     return false;
 
-  // Process only up to the last event at the time of starting the dispatch.
-  auto last_event = event_queue_.end();
-  for (auto event_it = event_queue_.begin(); event_it != last_event;) {
+  // Process any enqueued events. Note that events added during a dispatch are
+  // stored in a separate list and added back at the end.
+  for (auto event_it = event_queue_.begin(); event_it != event_queue_.end();) {
     auto listener_list_it = listener_map_.find(event_it->first);
     if (listener_list_it == listener_map_.end()) {
       ++event_it;
@@ -129,7 +129,17 @@ bool GenericEventQueue::Dispatch() {
     // Advance to the next event.
     ++event_it;
     event_queue_.pop_front();
+
+    // The end iterator of a deque might be invalidated after removing the last
+    // element on it. This is required to fix a debug error in MSVC.
+	if (event_queue_.empty())
+      break;
   }
+
+  // Move any events enqueued during dispatch to the event queue.
+  for (auto& event : events_enqueued_during_dispatch_)
+    event_queue_.emplace_back(std::move(event));
+  events_enqueued_during_dispatch_.clear();
 
   current_dispatch_event_ = nullptr;
   return true;

@@ -59,8 +59,8 @@ class Object {
 
   // Explicit copy constructors to allow storing volatile objects.
   // Implicit ones do not support volatile.
-  Object(const Object& object);
-  Object(const volatile Object& object);
+  explicit Object(const Object& object);
+  explicit Object(const volatile Object& object);
 
   // Returns the sum of the provided arguments and the stored object id.
   int Sum(int x, int y);
@@ -120,8 +120,8 @@ class OverloadedCallable {
 
   // Explicit copy constructors to allow storing volatile objects.
   // Implicit ones do not support volatile.
-  OverloadedCallable(const OverloadedCallable& callable);
-  OverloadedCallable(const volatile OverloadedCallable& callable);
+  explicit OverloadedCallable(const OverloadedCallable& callable);
+  explicit OverloadedCallable(const volatile OverloadedCallable& callable);
 
   // Overloads of operator ().
   int operator()(CVQualification& cv);

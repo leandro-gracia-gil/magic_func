@@ -165,6 +165,7 @@ class TypeErasedObject {
   // Possible contents of the data buffer.
   template <typename T>
   union DataBuffer {
+    ~DataBuffer() = delete;
     CustomUniquePtr<T> unique_ptr;
     std::shared_ptr<T> shared_ptr;
   };

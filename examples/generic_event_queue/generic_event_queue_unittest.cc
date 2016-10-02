@@ -383,15 +383,15 @@ TEST(GenericEventQueue, DispatchWithinDispatch) {
 TEST(GenericEventQueue, MultithreadedUse) {
   GenericEventQueue event_queue;
 
-  static const size_t N = 100;   // Number of threads to spawn.
-  static const size_t E = 100;  // Number of events per thread.
+  static constexpr uint64_t N = 5;    // Number of threads to spawn.
+  static constexpr uint64_t E = 100;  // Number of events per thread.
   std::thread t[N];
 
   size_t called[N];
-  std::atomic<size_t> sum(0);
+  std::atomic<uint64_t> sum(0);
   std::fill(called, called + N, 0);
 
-  srand(time(nullptr));
+  srand(static_cast<unsigned int>(time(nullptr)));
 
   // Spawn N threads. Each thread will:
   // 1. Spawn a listener that takes a ref and a value and adds it.

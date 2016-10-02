@@ -11,10 +11,18 @@ set(GOOGLETEST "${CMAKE_SOURCE_DIR}/googletest")
 #
 # Speed flags try to get the code as optimized as possible.
 if(MSVC)
+  # Required to match the settings in googletest.
+  # This is only because we build unit tests. It's not a MagicFunc requirement.
+  foreach(flag_var
+          CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+          CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+    string(REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+  endforeach()
+
   set(TEST_FLAGS /EHsc)
   set(TEST_FLAGS_CPP14 /EHsc)
-  set(SPEED_FLAGS /GR- /Ob2 /Ot /MD /GS-)
-  set(SPEED_FLAGS_CPP14 /GR- /Ob2 /Ot /MD /GS-)
+  set(SPEED_FLAGS /GR- /Ob2 /Ot /GS-)
+  set(SPEED_FLAGS_CPP14 /GR- /Ob2 /Ot /GS-)
 else()
   set(TEST_FLAGS -std=c++11)
   set(TEST_FLAGS_CPP14 -std=c++14)

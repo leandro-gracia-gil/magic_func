@@ -60,9 +60,15 @@ class TypeErasedFunction {
   inline TypeErasedFunction& operator =(TypeErasedFunction&& function);
 
   // Tells if the object point to a valid function or not.
-  explicit operator bool() const noexcept { return func_ptr_; }
-  bool operator ==(std::nullptr_t) const noexcept { return !func_ptr_; }
-  bool operator !=(std::nullptr_t) const noexcept { return func_ptr_; }
+  explicit operator bool() const noexcept { return func_ptr_ != nullptr; }
+
+  bool operator ==(std::nullptr_t) const noexcept {
+	  return func_ptr_ == nullptr;
+  }
+
+  bool operator !=(std::nullptr_t) const noexcept {
+	  return func_ptr_ != nullptr;
+  }
 
   // Provides a unique integer representation of the type this object is
   // encapsulating. Type ids can be uninitialized (with a value of 0), but once
