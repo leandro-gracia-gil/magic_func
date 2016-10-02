@@ -86,7 +86,8 @@ void BenchmarkFunction() {
     TestFunction(mean_del, stdev_del, function, call_count);
   }
   std::cout << "delegate " << mean_del << " " << stdev_del << std::endl;
-  std::cout << "Speed-up " << (mean_del / mean_mf) << "x (delegate) -- " << (mean_std / mean_mf) << "x (std)\n" << std::endl;
+  std::cout << "Speed-up " << (mean_del / mean_mf) << "x (delegate) -- "
+            << (mean_std / mean_mf) << "x (std)\n" << std::endl;
 }
 
 void BenchmarkFunctionLambda() {
@@ -118,11 +119,14 @@ void BenchmarkFunctionLambda() {
     TestFunction(mean_del, stdev_del, function);
   }
   std::cout << "delegate " << mean_del << " " << stdev_del << std::endl;
-  std::cout << "Speed-up " << (mean_del / mean_mf) << "x (delegate) -- " << (mean_std / mean_mf) << "x (std)\n" << std::endl;
+  std::cout << "Speed-up " << (mean_del / mean_mf) << "x (delegate) -- "
+            << (mean_std / mean_mf) << "x (std)\n" << std::endl;
 }
 
 void BenchmarkBoundMemberFunctionAddressAndPointer() {
-  std::cout << "# Calling a member function bound to an object pointer (mean, stdev)." << std::endl;
+  std::cout
+      << "# Calling a member function bound to an object pointer (mean, stdev)."
+      << std::endl;
 
   double mean_std = 0.0, stdev_std = 0.0;
   {
@@ -144,12 +148,13 @@ void BenchmarkBoundMemberFunctionAddressAndPointer() {
 
   double mean_del = 0.0, stdev_del = 0.0;
   {
-    Object object;
-    auto function(delegate<void(int)>::from<Object, &Object::Function>(&object));
+    Object obj;
+    auto function(delegate<void(int)>::from<Object, &Object::Function>(&obj));
     TestFunction(mean_del, stdev_del, function, 1);
   }
   std::cout << "delegate " << mean_del << " " << stdev_del << std::endl;
-  std::cout << "Speed-up " << (mean_del / mean_mf) << "x (delegate) -- " << (mean_std / mean_mf) << "x (std)\n" << std::endl;
+  std::cout << "Speed-up " << (mean_del / mean_mf) << "x (delegate) -- "
+            << (mean_std / mean_mf) << "x (std)\n" << std::endl;
 }
 
 int main() {
