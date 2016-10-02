@@ -20,6 +20,7 @@ Other features:
 - Supports overloaded functions and provides mechanisms to disambiguate all cases.
 - No virtual functions or C++ RTTI functionalities are used. Heap memory is only used on lambdas and callables.
 - Provides a flexible error system for managing invalid operations.
+- Support for custom allocators.
 
 ## Basics
 MagicFunc has two main classes:
@@ -241,12 +242,12 @@ auto bar_2 = mf::Function<void(int)>::FromMemberFunction<const Object, &Object::
 ```
 
 ## Frequently Asked Questions
-- ### How do I use MagicFunc in my project? Does it have any dependencies?
+### How do I use MagicFunc in my project? Does it have any dependencies?
 
 MagicFunc is a header-only library, so you only need to copy the contents of the include folder somewhere in your include path.
 No dependencies are required to use MagicFunc. The googletest library is used for unit testing, but it's not required otherwise.
 
-- ### Is there anything that std::function supports but mf::Function or mf::MemberFunction do not?
+### Is there anything that std::function supports but mf::Function or mf::MemberFunction do not?
 
 Yes, mf::Function and mf::MemberFunction cannot take function or member function pointers, but only explicit function addresses that have linkage. This is because the addresses are passed as template arguments.
 Supporting function and member function pointers is possible, but it would require practices that are non-compliant with the standard (member function pointers cannot be type-erased) and would affect overall performance.
@@ -283,7 +284,7 @@ auto bar3 = mf::MakeFunction([&object, bar_ptr](int arg) { return (object.*bar_p
 bar3(42);
 ```
 
-- ### Is there a mf::Bind or some alternative to std::bind?
+### Is there a mf::Bind or some alternative to std::bind?
 
 There's no mf::Bind because we consider it's not worth the complexity it brings to the code when a simple lambda can be used instead. Using std::bind can be more error-prone than it seems.
 ```c++
@@ -310,7 +311,7 @@ auto bar2 = mf::MakeFunction([&object](int arg2) { return object.Bar(32, arg2); 
 bar2(64);
 ```
 
-- ### When should MF_MakeFunction and mf::MakeFunction be used?
+### When should MF_MakeFunction and mf::MakeFunction be used?
 
 In reality one uses the other. MF_MakeFunction is just a macro that saves us some syntax ugliness that we would otherwise have trying to pass function pointers as template arguments.
 In general the rule of thumb is: if you are passing a function or member function address directly use the **MF_MakeFunction** macro. Otherwise (like passing lambdas and mf::MemberFunction objects) use **mf::MakeFunction**.
@@ -337,16 +338,16 @@ mf::MemberFunction<decltype(&Object::Foo)> member_function = MF_MakeFunction(&Ob
 auto foo4 = mf::MakeFunction(member_function, &object);  // Returns a mf::Function<void(int)>.
 ```
 
-- ### How does MagicFunc perform against other std::function alternatives like impossibly fast delegates?
+### How does MagicFunc perform against other std::function alternatives like impossibly fast delegates?
 
 Benchmarking against a [C++11 version of fast delegates](http://codereview.stackexchange.com/questions/14730/impossibly-fast-delegate-in-c11) suggests that both have a very similar performance when using Clang, and that MagicFunc performs about 10~15% better in some cases when using modern versions of GCC. It is not possible to compare directly with that fast delegate implementation using MSVC 2015 as its code does not build. In all measured cases MagicFunc is at least as good as std::function, most times notably faster.
 
-- ### Can I mix std::function and std::bind with mf::Function?
+### Can I mix std::function and std::bind with mf::Function?
 
 Yes, you can without any additional effort in both directions. This is because all std::function, std::bind and mf::Function act as callables, so this goes back to the callable / lambda case.
 However, keep in mind that if you make a mf::Function call a std::function you will hit the performance costs of both.
 
-- ### Is heap memory used? Can I use my custom allocators if so?
+### Is heap memory used? Can I use my custom allocators if so?
 
 Heap memory is only used when callables and lambdas are involved. This is because the size of a lambda depends on its capture, so it's not possible to allocate anything ahead of time.
 Also, experiments showed that trying to store objects within a mf::TypeErasedFunction performed worse than allocating small amounts of memory in the heap, and had potential alignment issues.
