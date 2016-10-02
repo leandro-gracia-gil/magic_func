@@ -30,6 +30,7 @@
 #ifndef MAGIC_FUNC_ALLOCATOR_H_
 #define MAGIC_FUNC_ALLOCATOR_H_
 
+#include <cstdlib>
 #include <utility>
 
 namespace mf {

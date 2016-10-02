@@ -28,6 +28,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <array>
+#include <bitset>
 #include <memory>
 
 #include <magic_func/allocator.h>
@@ -37,16 +38,16 @@
 
 using namespace mf;
 
-// Allocates memory within a local buffer.
+// Allocates memory within a local buffer based on blocks of a provided size.
 //
 // @tparam BlockSize Size of each allocation block.
 // @tparam NumBlocks Number of blocks in the allocator buffer.
 template <size_t BlockSize, size_t NumBlocks>
-class CustomAllocator {
+class SampleCustomAllocator {
  public:
   static constexpr size_t kBufferSize = BlockSize * NumBlocks;
 
-  CustomAllocator() : buffer_(new uint8_t[kBufferSize]) {}
+  SampleCustomAllocator() : buffer_(new uint8_t[kBufferSize]) {}
 
   void* Allocate(size_t size, size_t alignment) {
     if (size == 0)
@@ -154,7 +155,7 @@ class CustomAllocator {
   std::bitset<NumBlocks> blocks_used_;
 };
 
-using TestAllocator = CustomAllocator<256, 1024>;
+using TestAllocator = SampleCustomAllocator<256, 1024>;
 
 TEST(Allocator, CallStoredLambda) {
   TestAllocator allocator;

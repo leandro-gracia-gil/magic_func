@@ -55,11 +55,11 @@ TEST(GenericEventQueue, DispatchEventNeedsEnqueue) {
         called = true;
       });
 
-  EXPECT_EQ(false, called);
-  EXPECT_EQ(true, event_queue.Dispatch());
+  EXPECT_FALSE(called);
+  EXPECT_TRUE(event_queue.Dispatch());
 
   // No event is enqueued despite being a listener.
-  EXPECT_EQ(false, called);
+  EXPECT_FALSE(called);
 }
 
 TEST(GenericEventQueue, DispatchEventNoArgs) {
@@ -74,9 +74,9 @@ TEST(GenericEventQueue, DispatchEventNoArgs) {
 
   event_queue.Enqueue(&Events::NoArgs);
 
-  EXPECT_EQ(false, called);
-  EXPECT_EQ(true, event_queue.Dispatch());
-  EXPECT_EQ(true, called);
+  EXPECT_FALSE(called);
+  EXPECT_TRUE(event_queue.Dispatch());
+  EXPECT_TRUE(called);
 }
 
 TEST(GenericEventQueue, DispatchEventWithArgs) {
@@ -93,9 +93,9 @@ TEST(GenericEventQueue, DispatchEventWithArgs) {
 
   event_queue.Enqueue(&Events::WithArgs, 23, "testing");
 
-  EXPECT_EQ(false, called);
-  EXPECT_EQ(true, event_queue.Dispatch());
-  EXPECT_EQ(true, called);
+  EXPECT_FALSE(called);
+  EXPECT_TRUE(event_queue.Dispatch());
+  EXPECT_TRUE(called);
 }
 
 TEST(GenericEventQueue, DispatchEventLvalueReference) {
@@ -113,11 +113,11 @@ TEST(GenericEventQueue, DispatchEventLvalueReference) {
   int x = 23;
   event_queue.Enqueue(&Events::LvalueRef, std::ref(x));
 
-  EXPECT_EQ(false, called);
+  EXPECT_FALSE(called);
   EXPECT_EQ(23, x);
-  EXPECT_EQ(true, event_queue.Dispatch());
+  EXPECT_TRUE(event_queue.Dispatch());
 
-  EXPECT_EQ(true, called);
+  EXPECT_TRUE(called);
   EXPECT_EQ(42, x);
 }
 
@@ -145,7 +145,7 @@ TEST(GenericEventQueue, DispatchEventNonCopyable) {
   event_queue.Enqueue(&Events::NonCopyable, std::move(ptr));
 
   EXPECT_EQ(0U, called.size());
-  EXPECT_EQ(true, event_queue.Dispatch());
+  EXPECT_TRUE(event_queue.Dispatch());
 
   ASSERT_EQ(2U, called.size());
   for (size_t i = 0; i < called.size(); ++i)
@@ -186,7 +186,7 @@ TEST(GenericEventQueue, DispatchEventRvalueReference) {
   event_queue.Enqueue(&Events::RvalueRef, std::move(ptr));
 
   EXPECT_EQ(0U, called.size());
-  EXPECT_EQ(true, event_queue.Dispatch());
+  EXPECT_TRUE(event_queue.Dispatch());
 
   ASSERT_EQ(3U, called.size());
   for (size_t i = 0; i < called.size(); ++i)
@@ -234,7 +234,7 @@ TEST(GenericEventQueue, DispatchEventMultipleListeners) {
   event_queue.Enqueue(&Events::NoArgs);
 
   EXPECT_EQ(0U, called.size());
-  EXPECT_EQ(true, event_queue.Dispatch());
+  EXPECT_TRUE(event_queue.Dispatch());
 
   ASSERT_EQ(4U, called.size());
   for (size_t i = 0; i < called.size(); ++i)
@@ -268,7 +268,7 @@ TEST(GenericEventQueue, RemoveListeners) {
   event_queue.RemoveEventListener(&Events::NoArgs, id[1]);
 
   EXPECT_EQ(0U, called.size());
-  EXPECT_EQ(true, event_queue.Dispatch());
+  EXPECT_TRUE(event_queue.Dispatch());
 
   ASSERT_EQ(2U, called.size());
   for (size_t i = 0; i < called.size(); ++i)
@@ -279,7 +279,7 @@ TEST(GenericEventQueue, RemoveListeners) {
   called.clear();
 
   event_queue.Enqueue(&Events::NoArgs);
-  EXPECT_EQ(true, event_queue.Dispatch());
+  EXPECT_TRUE(event_queue.Dispatch());
   EXPECT_EQ(0U, called.size());
 }
 
@@ -305,14 +305,14 @@ TEST(GenericEventQueue, EnqueueEventsDuringDispatch) {
   event_queue.Enqueue(&Events::NoArgs);
 
   EXPECT_EQ(0U, called.size());
-  EXPECT_EQ(true, event_queue.Dispatch());
+  EXPECT_TRUE(event_queue.Dispatch());
 
   // Only the first event listener should be called in the dispatch.
   ASSERT_EQ(1U, called.size());
   EXPECT_EQ(0, called[0]);
 
   // The second event listener should be called after this dispatch.
-  EXPECT_EQ(true, event_queue.Dispatch());
+  EXPECT_TRUE(event_queue.Dispatch());
   ASSERT_EQ(2U, called.size());
   for (size_t i = 0; i < called.size(); ++i)
     EXPECT_EQ(i, called[i]);
@@ -341,7 +341,7 @@ TEST(GenericEventQueue, RemoveListenersDuringDispatch) {
   event_queue.Enqueue(&Events::NoArgs);
 
   EXPECT_EQ(0U, called.size());
-  EXPECT_EQ(true, event_queue.Dispatch());
+  EXPECT_TRUE(event_queue.Dispatch());
 
   // During the first event both listeners should have been called.
   // This is because the listener removal is not effective until all listeners
@@ -361,7 +361,7 @@ TEST(GenericEventQueue, DispatchWithinDispatch) {
       &Events::NoArgs,
       [&called, &event_queue]() {
         called.push_back(0);
-        EXPECT_EQ(false, event_queue.Dispatch());
+        EXPECT_FALSE(event_queue.Dispatch());
       });
 
   event_queue.AddEventListener(
@@ -373,7 +373,7 @@ TEST(GenericEventQueue, DispatchWithinDispatch) {
   event_queue.Enqueue(&Events::NoArgs);
 
   EXPECT_EQ(0U, called.size());
-  EXPECT_EQ(true, event_queue.Dispatch());
+  EXPECT_TRUE(event_queue.Dispatch());
 
   ASSERT_EQ(2U, called.size());
   for (size_t i = 0; i < called.size(); ++i)
@@ -383,12 +383,12 @@ TEST(GenericEventQueue, DispatchWithinDispatch) {
 TEST(GenericEventQueue, MultithreadedUse) {
   GenericEventQueue event_queue;
 
-  static const int N = 100;   // Number of threads to spawn.
-  static const int E = 100;  // Number of events per thread.
+  static const size_t N = 100;   // Number of threads to spawn.
+  static const size_t E = 100;  // Number of events per thread.
   std::thread t[N];
 
-  int called[N];
-  std::atomic<int> sum(0);
+  size_t called[N];
+  std::atomic<size_t> sum(0);
   std::fill(called, called + N, 0);
 
   srand(time(nullptr));
@@ -399,11 +399,11 @@ TEST(GenericEventQueue, MultithreadedUse) {
   //
   // The result should be that sum will contain N times the sum of the first
   // N * E odd numbers, which is equivalent to N * (N * E)^2.
-  for (int num_thread = 0; num_thread < N; ++num_thread) {
+  for (size_t num_thread = 0; num_thread < N; ++num_thread) {
     t[num_thread] = std::thread([num_thread, &event_queue, &called, &sum]() {
       event_queue.AddEventListener(
           &Events::WithArgs,
-          [num_thread, &called, &sum](int value, const std::string& str) {
+          [num_thread, &called, &sum](size_t value, const std::string& str) {
             sum += value;
             ++called[num_thread];
           });
@@ -413,9 +413,9 @@ TEST(GenericEventQueue, MultithreadedUse) {
       while (event_queue.CountListeners(&Events::WithArgs) < N)
         std::this_thread::yield();
 
-      int start = E * num_thread;
-      int end = E * (num_thread + 1);
-      for (int i = start; i < end; ++i)
+      size_t start = E * num_thread;
+      size_t end = E * (num_thread + 1);
+      for (size_t i = start; i < end; ++i)
         event_queue.Enqueue(&Events::WithArgs, 2 * i + 1, "");
 
       // Sleep a random amount of time to make the multithreading behavior
@@ -424,16 +424,16 @@ TEST(GenericEventQueue, MultithreadedUse) {
 
       // Dispatch the events. There might be events already enqueued by other
       // threads, which will be dispatched too.
-      EXPECT_EQ(true, event_queue.Dispatch());
+      EXPECT_TRUE(event_queue.Dispatch());
     });
   }
 
   // Wait for all 3 threads to finish.
-  for (int num_thread = 0; num_thread < N; ++num_thread)
+  for (size_t num_thread = 0; num_thread < N; ++num_thread)
     t[num_thread].join();
 
   // Each thread should have received E events from each of the N threads.
-  for (int i = 0; i < N; ++i)
+  for (size_t i = 0; i < N; ++i)
     EXPECT_EQ(N * E, called[i]);
 
   // The sum of the first x numbers is equal to x^2.
