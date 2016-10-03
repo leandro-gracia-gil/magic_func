@@ -63,11 +63,11 @@ class TypeErasedFunction {
   explicit operator bool() const noexcept { return func_ptr_ != nullptr; }
 
   bool operator ==(std::nullptr_t) const noexcept {
-	  return func_ptr_ == nullptr;
+    return func_ptr_ == nullptr;
   }
 
   bool operator !=(std::nullptr_t) const noexcept {
-	  return func_ptr_ != nullptr;
+    return func_ptr_ != nullptr;
   }
 
   // Provides a unique integer representation of the type this object is
