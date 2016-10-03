@@ -6,6 +6,13 @@ target_sources(generic_event_queue PRIVATE
   generic_event_queue/main.cc
 )
 
+# IMPORTANT: when using Visual Studio make sure to use /OPT:NOICF when using
+# the generic event queue. This flag prevents the compiler from merging empty
+# functions into the same address. Otherwise all events are fold together.
+if(MSVC)
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /OPT:NOICF")
+endif()
+
 target_compile_options(generic_event_queue PRIVATE "${SPEED_FLAGS_CPP14}")
 
 # Generic event queue unit test.
