@@ -13,7 +13,6 @@ struct KeyboardEvent {
   static void OnKeyUp(int key) {}
 };
 ```
-
 These are not actual functions you call, but rather represent the interface of an event you can listen to.
 
 Then, if you want to listen for an event you do:
@@ -48,3 +47,8 @@ event_queue.Dispatch();
 This will synchronously call all registered listeners for any events that were enqueued in the order they were.
 
 This example class is thread-safe and handles reentrant events to avoid dispatch calls that could cause infinite loops. All these features are unit tested.
+
+&#x1F534; ** IMPORTANT NOTE ** &#x1F534;
+Compiler optimizations that merge together different functions that do the same (like being empty) into the same address will make the generic event queue to fail. This is particularly the case of Release builds in MSVC, which can be avoided by using the /OPT:NOICF linker argument.
+
+If you suspect something weird is going on or you get an assertion failure, double-check that no different events have the same address when converted to void\*.

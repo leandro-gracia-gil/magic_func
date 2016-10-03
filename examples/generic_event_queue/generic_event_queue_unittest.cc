@@ -195,6 +195,13 @@ TEST(GenericEventQueue, DispatchEventRvalueReference) {
 #endif  // __cplusplus >= 201402L
 
 TEST(GenericEventQueue, DispatchEventMultipleListeners) {
+  // Some compiler optimizations can merge functions with identical content like
+  // empty events into the same address in memory. If so, uniqueness of event
+  // functions is no longer true and the generic event queue fails. Note that
+  // MagicFunc itself is not affected by this issue, only this example.
+  ASSERT_NE(reinterpret_cast<void*>(&Events::NoArgs),
+            reinterpret_cast<void*>(&Events::WithArgs));
+
   GenericEventQueue event_queue;
   std::vector<int> called;
 

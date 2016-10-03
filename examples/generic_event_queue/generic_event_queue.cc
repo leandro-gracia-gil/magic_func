@@ -27,6 +27,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <magic_func/error.h>
+
 #include "generic_event_queue.h"
 
 GenericEventQueue::GenericEventQueue()
@@ -44,6 +46,17 @@ GenericEventQueue::ListenerId GenericEventQueue::AddEventListener(
   std::lock_guard<std::recursive_mutex> lock(mutex_);
   ListenerId id = ++last_id_;
   ListenerList& listener_list = listener_map_[event];
+
+  // Check if existing listeners have the same type id as the listener function
+  // we're setting. This is to detect possible errors caused by some compiler
+  // optimizations that merge multiple functions of different types into the
+  // same function address when they do the same (for example, are empty).
+  if (!listener_list.empty()) {
+    MAGIC_FUNC_CHECK(
+        listener.type_id() == listener_list.front().second.type_id(),
+        mf::Error::kIncompatibleType);
+  }
+
   listener_list.emplace_back(std::make_pair(id, std::move(listener)));
   return id;
 }
@@ -96,7 +109,7 @@ bool GenericEventQueue::Dispatch() {
 
   // Process any enqueued events. Note that events added during a dispatch are
   // stored in a separate list and added back at the end.
-  for (auto event_it = event_queue_.begin(); event_it != event_queue_.end();) {
+  for (auto event_it = event_queue_.begin(); event_it != event_queue_.end(); ) {
     auto listener_list_it = listener_map_.find(event_it->first);
     if (listener_list_it == listener_map_.end()) {
       ++event_it;
@@ -132,7 +145,7 @@ bool GenericEventQueue::Dispatch() {
 
     // The end iterator of a deque might be invalidated after removing the last
     // element on it. This is required to fix a debug error in MSVC.
-	if (event_queue_.empty())
+    if (event_queue_.empty())
       break;
   }
 
