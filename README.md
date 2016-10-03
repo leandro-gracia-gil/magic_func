@@ -35,6 +35,8 @@ When trying to use mf::MakeFunction with explicit function addresses (not pointe
 
 See the section below for examples of each use case.
 
+#### &#x1F534; **IMPORTANT NOTE** &#x1F534;
+When using MagicFunc in a Release build in MSVC, make sure to disable COMDAT folding (Linker -> Optimization) or pass the [/OPT:NOICF](https://msdn.microsoft.com/en-us/library/bxwfs976(v=vs.140).aspx) linker argument. Not doing so can lead to failures of MagicFunc's type id system.
 
 ## Examples
 ### Calling a free or static function
