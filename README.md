@@ -181,9 +181,10 @@ Object object;
 auto foo_func_restored = mf::FunctionCast<decltype(&Object::Foo)>(many_functions[0]);  // Returns a mf::MemberFunction<decltype(&Object::Foo)>.
 foo_func_restored(object, 42);
 
-// However, note that there are runtime type checks going on when calling mf::FunctionCast.
-// If we try something invalid we will get an error. What this error does depends on our error.h configuration.
-// By default if exceptions are enabled we can catch the failure. If they are not we would terminate.
+// However, note that a runtime type check is performed when calling mf::FunctionCast.
+// If we try something invalid we will get an error. What this error does depends on our error.h configuration and the type of build.
+// By default, exceptions are disabled if the NDEBUG macro is defined. This is usual in release builds.
+// If exceptions are enabled then we can catch the failure. If they are not we would terminate.
 // For illustrative purposes let's assume exceptions are enabled.
 try {
   auto invalid_cast = mf::FunctionCast<void()>(type_erased_foo);
@@ -206,7 +207,6 @@ try {
 } catch (mf::Error error) {
   assert(error == mf::Error::kInvalidCast);
 }
-
 ```
 
 ### Disambiguating overloaded functions
