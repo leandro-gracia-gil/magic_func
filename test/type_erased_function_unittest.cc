@@ -27,6 +27,10 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+// This test needs C++ exceptions thrown by MagicFunc exceptions to work.
+// These exceptions are turned off in release builds that define NDEBUG.
+#undef NDEBUG
+
 #include <magic_func/error.h>
 #include <magic_func/make_function.h>
 #include <magic_func/type_erased_function.h>
