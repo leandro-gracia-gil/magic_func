@@ -8,7 +8,12 @@
 #include <magic_func/make_function.h>
 #include <magic_func/member_function.h>
 
+// The fast delegate implementation does not build in MSVC 2015.
+#ifdef _MSC_VER
+#define DISABLE_DELEGATES
+#else
 #include "delegate.h"
+#endif
 
 static constexpr size_t kNumExperiments = 100;
 static constexpr size_t kNumIterations = 10000000;
@@ -79,6 +84,7 @@ void BenchmarkFunction() {
   }
   std::cout << "mf::Function " << mean_mf << " " << stdev_mf << std::endl;
 
+#ifndef DISABLE_DELEGATES
   double mean_del = 0.0, stdev_del = 0.0;
   {
     size_t call_count = 0;
@@ -88,6 +94,9 @@ void BenchmarkFunction() {
   std::cout << "delegate " << mean_del << " " << stdev_del << std::endl;
   std::cout << "Speed-up " << (mean_del / mean_mf) << "x (delegate) -- "
             << (mean_std / mean_mf) << "x (std)\n" << std::endl;
+#else
+  std::cout << "Speed-up " << (mean_std / mean_mf) << "x (std)\n" << std::endl;
+#endif
 }
 
 void BenchmarkFunctionLambda() {
@@ -111,6 +120,7 @@ void BenchmarkFunctionLambda() {
   }
   std::cout << "mf::Function " << mean_mf << " " << stdev_mf << std::endl;
 
+#ifndef DISABLE_DELEGATES
   double mean_del = 0.0, stdev_del = 0.0;
   {
     size_t call_count = 0;
@@ -121,6 +131,9 @@ void BenchmarkFunctionLambda() {
   std::cout << "delegate " << mean_del << " " << stdev_del << std::endl;
   std::cout << "Speed-up " << (mean_del / mean_mf) << "x (delegate) -- "
             << (mean_std / mean_mf) << "x (std)\n" << std::endl;
+#else
+  std::cout << "Speed-up " << (mean_std / mean_mf) << "x (std)\n" << std::endl;
+#endif
 }
 
 void BenchmarkBoundMemberFunctionAddressAndPointer() {
@@ -146,6 +159,7 @@ void BenchmarkBoundMemberFunctionAddressAndPointer() {
   }
   std::cout << "mf::Function " << mean_mf << " " << stdev_mf << std::endl;
 
+#ifndef DISABLE_DELEGATES
   double mean_del = 0.0, stdev_del = 0.0;
   {
     Object obj;
@@ -155,6 +169,9 @@ void BenchmarkBoundMemberFunctionAddressAndPointer() {
   std::cout << "delegate " << mean_del << " " << stdev_del << std::endl;
   std::cout << "Speed-up " << (mean_del / mean_mf) << "x (delegate) -- "
             << (mean_std / mean_mf) << "x (std)\n" << std::endl;
+#else
+  std::cout << "Speed-up " << (mean_std / mean_mf) << "x (std)\n" << std::endl;
+#endif
 }
 
 int main() {
