@@ -32,6 +32,19 @@
 
 #include <cstdint>
 
+// Visual Studio applies some optimizations in Release mode that fold functions
+// performing the same operations into the same address in memory. This violates
+// the assumption of function address uniqueness and screws up the behavior of
+// GetTypeId(). This should not happen since these functions have their
+// addresses taken, so this could be a linker bug.
+//
+// The following pragma disables this function folding feature. This is the
+// same as setting Linker -> Optimization -> Disable COMDAT folding.
+// See https://msdn.microsoft.com/en-us/library/bxwfs976(v=vs.140).aspx).
+#ifdef _MSC_VER
+#pragma comment(linker, "/OPT:NOICF")
+#endif
+
 namespace mf {
 
 using TypeId = intptr_t;

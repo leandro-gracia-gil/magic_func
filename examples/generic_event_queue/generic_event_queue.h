@@ -45,6 +45,19 @@
 #include "event_tuple_extractor.h"
 #include "selective_decay.h"
 
+// Visual Studio applies some optimizations in Release mode that fold functions
+// performing the same operations into the same address in memory. This can put
+// multiple events (empty functions) into the same memory address, violating the
+// assumption of function address uniqueness and making this class produce
+// undefined behavior.
+//
+// The following pragma disables this function folding feature. This is the
+// same as setting Linker -> Optimization -> Disable COMDAT folding.
+// See https://msdn.microsoft.com/en-us/library/bxwfs976(v=vs.140).aspx).
+#ifdef _MSC_VER
+#pragma comment(linker, "/OPT:NOICF")
+#endif
+
 // A versatile, simple to use, thread-safe general purpose event queue with
 // support for broadcast and observer patterns.
 //

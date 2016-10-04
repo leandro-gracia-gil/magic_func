@@ -11,13 +11,6 @@ set(GOOGLETEST "${CMAKE_SOURCE_DIR}/googletest")
 #
 # Speed flags try to get the code as optimized as possible.
 if(MSVC)
-  # IMPORTANT: when using Visual Studio make sure to use /OPT:NOICF as otherwise
-  # MagicFunc's type id mechanism might not work correctly and might fail to
-  # detect errors.
-if(MSVC)
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /OPT:NOICF")
-endif()
-
   # Required to match the settings in googletest.
   # This is only because we build unit tests. It's not a MagicFunc requirement.
   foreach(flag_var
