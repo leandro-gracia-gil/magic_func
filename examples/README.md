@@ -47,3 +47,6 @@ event_queue.Dispatch();
 This will synchronously call all registered listeners for any events that were enqueued in the order they were.
 
 This example class is thread-safe and handles reentrant events to avoid dispatch calls that could cause infinite loops. All these features are unit tested.
+
+#### &#x1F534; **IMPORTANT NOTE** &#x1F534;
+When using MagicFunc in a Release build in MSVC, make sure to disable COMDAT folding (Linker -> Optimization) or pass the [/OPT:NOICF](https://msdn.microsoft.com/en-us/library/bxwfs976(v=vs.140).aspx) linker argument. Not doing so will lead to different events having the same function address, which can cause assertion failures in the generic event queue.
