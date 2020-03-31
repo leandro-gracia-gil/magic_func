@@ -5,6 +5,7 @@ MagicFunc is a faster alternative to std::function featuring type erasure.
 It's main features are:
 - Supports most features of std::function including lambdas and other callable objects.
 - Allows storing function objects of different types together thanks to function type erasure.
+- Lightweight header-only library. Just copy the headers to your include path and you're set.
 - Requires only C++11 support. Works with MSVC 2015, GCC and Clang.
 - Measured speed-ups up to 2x against std::function.
 - Compatible with std::function and std::bind.
@@ -45,24 +46,25 @@ When using MagicFunc in a Release build in MSVC, make sure to disable COMDAT fol
 #include <magic_func/make_function.h>
 
 // Here's a free function to call.
-int Foo();
+void Foo(int x);
 
 // Here's a class with a static function to call.
 class Object {
  public:
-  static void Bar();
+  static int Bar();
 };
 
 // Like std::function, but using the MF_MakeFunction helper macro.
-mf::Function<int(void)> foo1 = MF_Makefunction(&Foo);
-foo1();
+mf::Function<void(int)> foo1 = MF_MakeFunction(&Foo);
+foo1(123);
 
 // MagicFunc can also guess your function type for you if it's not overloaded.
-auto foo2 = MF_Makefunction(&Foo);  // Returns a mf::Function<int(void)>.
-foo2();
+auto foo2 = MF_MakeFunction(&Foo);  // Returns a mf::Function<void(int)>.
+foo2(456);
 
-auto bar2 = MF_Makefunction(&Object::Bar);  // Returns a mf::Function<void()>.
-bar2();
+// Works the same with static functions.
+auto bar = MF_MakeFunction(&Object::Bar);  // Returns a mf::Function<int()>.
+int result = bar();
 ```
 
 ### Calling a member function
@@ -113,13 +115,13 @@ foo(42);
 // You can also pass a shared pointer to the object so that the mf::Function object keeps it alive.
 // This guarantees the lifetime of the called object.
 std::shared_ptr<Object> object_shared = std::make_shared<Object>();
-auto foo_shared = MF_MakeFunction(&Object::Foo, object);
+auto foo_shared = MF_MakeFunction(&Object::Foo, object_shared);
 foo_shared(42);
 
 // If you want to ensure the lifetime of the object but don't want to keep it alive you can use a std::weak_ptr with a lambda.
 // Support for std::weak_ptr is not directly integrated because it causes ambiguity with the cast from shared to weak_ptrs.
 std::weak_ptr<Object> object_weak = object_shared;
-mf::Function<void()> foo_weak = [object_weak](int x) {
+mf::Function<void(int)> foo_weak = [object_weak](int x) {
   std::shared_ptr<Object> object = object_weak.lock();
   if (object)
     object->Foo(x);
@@ -127,8 +129,9 @@ mf::Function<void()> foo_weak = [object_weak](int x) {
 foo_weak(42);
 
 // Finally, you can also bind objects to mf::MemberFunctions to create mf::Functions.
-mf::MemberFunction<decltype(&Object::Foo)> foo_member_func = MF_MakeFunction(&Object::Foo);
-mf::Function<void()> foo_member(foo_member_func, &object);
+// As before, you can use raw pointers or shared pointers for the object. Weak pointers require the lambda trick above.
+mf::MemberFunction<decltype(&Object::Foo)> foo_member_func = MF_MakeFunction(&Object::Foo); 
+mf::Function<void(int)> foo_member(foo_member_func, &object);
 foo_member(42);
 ```
 
@@ -145,7 +148,7 @@ auto lambda2 = mf::MakeFunction([](int x, int y) { return x + y; });
 
 // Not only that, but you can actually have different lambda and function types as long as they are convertible.
 // In particular, function arguments must convert to lambda arguments, and the lambda return type must convert to the function one.
-auto get_string_char = [](const std::string& str, int i) { return str[i]; };
+auto get_string_char = [](const std::string& str, int i) -> int { return str[i]; };
 mf::Function<short(const char*, float)> lambda3 = get_string_char;
 lambda3("test", 1);  // Returns a short containing 'e'.
 ```
@@ -153,6 +156,7 @@ lambda3("test", 1);  // Returns a short containing 'e'.
 ### Using function type erasure
 ```c++
 #include <magic_func/function.h>
+#include <magic_func/function_cast.h>
 #include <magic_func/make_function.h>
 #include <vector>
 
@@ -207,7 +211,7 @@ try {
   some_function = type_erased_bar;
 
 } catch (mf::Error error) {
-  assert(error == mf::Error::kInvalidCast);
+  assert(error == mf::Error::kIncompatibleType);
 }
 ```
 
@@ -228,7 +232,7 @@ class Object {
 
 Object object;
 
-// This will fail because it won't know which version to call.
+// This will fail to compile because it won't know which version to call.
 auto function = MF_MakeFunction(&Object::Foo, &object);
 
 // Disambiguating by type signature.
@@ -237,10 +241,10 @@ auto foo_1 = mf::Function<int(int)>::FromMemberFunction<Object, &Object::Foo>(&o
 auto foo_2 = mf::Function<int(const std::string&)>::FromMemberFunction<Object, &Object::Foo>(&object);
 
 // Disambiguating by const volatile qualifiers.
-// In this case the function signature is not enough. We need to specify th const-volatile qualifiers of the object type.
+// In this case the function signature is not enough. We need to specify the const-volatile qualifiers of the object type.
 // The object type argument must have the same exact qualifications as the function we're targeting or it will fail to find it.
-auto bar_1 = mf::Function<void(int)>::FromMemberFunction<Object, &Object::Bar>(&object);  // Returns 1 when called.
-auto bar_2 = mf::Function<void(int)>::FromMemberFunction<const Object, &Object::Bar>(&object);  // Returns 2 when called.
+auto bar_1 = mf::Function<int(void)>::FromMemberFunction<Object, &Object::Bar>(&object);  // Returns 1 when called.
+auto bar_2 = mf::Function<int(void)>::FromMemberFunction<const Object, &Object::Bar>(&object);  // Returns 2 when called.
 ```
 
 ## Frequently Asked Questions
@@ -270,7 +274,7 @@ using BarFuncPtr = decltype(&Object::Bar);  // This is a member function pointer
 auto foo1 = MF_MakeFunction(&Object::Foo);  // Returns a mf::Function<int(int)> object.
 auto bar1 = MF_MakeFunction(&Object::Bar);  // Returns a mf::MemberFunction<int (Object::*)(int)> object.
 
-// This does not.
+// This does not compile.
 FooFuncPtr foo_ptr = &Object::Foo;
 auto foo2 = MF_MakeFunction(foo_ptr);
 
@@ -290,7 +294,7 @@ bar3(42);
 
 There's no mf::Bind because we consider it's not worth the complexity it brings to the code when a simple lambda can be used instead. Using std::bind can be more error-prone than it seems.
 ```c++
-int Foo(int arg);
+int Foo(int arg1, int arg2);
 
 class Object {
  public:
@@ -315,7 +319,7 @@ bar2(64);
 
 ### When should MF_MakeFunction and mf::MakeFunction be used?
 
-In reality one uses the other. MF_MakeFunction is just a macro that saves us some syntax ugliness that we would otherwise have trying to pass function pointers as template arguments.
+Actually, one uses the other. MF_MakeFunction is just a macro that saves us some syntax ugliness that we would otherwise have trying to pass function pointers as template arguments.
 In general the rule of thumb is: if you are passing a function or member function address directly use the **MF_MakeFunction** macro. Otherwise (like passing lambdas and mf::MemberFunction objects) use **mf::MakeFunction**.
 ```c++
 class Object {
@@ -361,7 +365,7 @@ std::allocator<uint8_t> some_allocator;
 
 mf::SetCustomAllocator(
     // Allocation function.
-    [](size_t size, size_t alignment, void* context) {
+    [](size_t size, size_t alignment, void* context) -> void* {
       auto allocator = reinterpret_cast<std::allocator<uint8_t>>(context);
       return allocator->allocate(size);
     }, &some_allocator,
@@ -369,7 +373,8 @@ mf::SetCustomAllocator(
     // Deallocation function.
     [](void* ptr, size_t size, size_t alignment, void* context) {
       auto allocator = reinterpret_cast<std::allocator<uint8_t>>(context);
-      return allocator->deallocate(ptr, size);
+      allocator->deallocate(static_cast<uint8_t*>(ptr), size);
+      return true;
     }, &some_allocator);
 
 // This now uses the provided allocator.
