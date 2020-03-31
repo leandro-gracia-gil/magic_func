@@ -129,7 +129,7 @@ mf::Function<void(int)> foo_weak = [object_weak](int x) {
 foo_weak(42);
 
 // Finally, you can also bind objects to mf::MemberFunctions to create mf::Functions.
-// As before, you can use raw pointers or shared pointers for the object. Weak pointers require the lambda trick above.
+// You can use raw pointers or shared pointers for the object. Weak pointers require the lambda trick above.
 mf::MemberFunction<decltype(&Object::Foo)> foo_member_func = MF_MakeFunction(&Object::Foo); 
 mf::Function<void(int)> foo_member(foo_member_func, &object);
 foo_member(42);
@@ -366,13 +366,13 @@ std::allocator<uint8_t> some_allocator;
 mf::SetCustomAllocator(
     // Allocation function.
     [](size_t size, size_t alignment, void* context) -> void* {
-      auto allocator = reinterpret_cast<std::allocator<uint8_t>>(context);
+      auto allocator = reinterpret_cast<std::allocator<uint8_t>*>(context);
       return allocator->allocate(size);
     }, &some_allocator,
 
     // Deallocation function.
     [](void* ptr, size_t size, size_t alignment, void* context) {
-      auto allocator = reinterpret_cast<std::allocator<uint8_t>>(context);
+      auto allocator = reinterpret_cast<std::allocator<uint8_t>*>(context);
       allocator->deallocate(static_cast<uint8_t*>(ptr), size);
       return true;
     }, &some_allocator);
