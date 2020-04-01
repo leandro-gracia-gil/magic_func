@@ -36,9 +36,6 @@ When trying to use mf::MakeFunction with explicit function addresses (not pointe
 
 See the section below for examples of each use case.
 
-#### &#x1F534; **IMPORTANT NOTE** &#x1F534;
-When using MagicFunc in a Release build in MSVC, make sure to disable COMDAT folding (Linker -> Optimization) or pass the [/OPT:NOICF](https://msdn.microsoft.com/en-us/library/bxwfs976(v=vs.140).aspx) linker argument. Not doing so can lead to failures of MagicFunc's type id system.
-
 ## Examples
 ### Calling a free or static function
 ```c++
@@ -385,3 +382,39 @@ auto func = mf::MakeFunction([=](int y) { return x + y; });
 However, note that allocators are set globally (statically) for all MagicFunc. Any required allocators should be set once before any other MagicFunc use and not changed again. This is because mf::Function objects do not save which allocators they use, as it would imply a noticeable increase in the size of all mf::Function objects. Changing allocators while MagicFunc objects exist can lead to issues like deallocations on incorrect functions.
 
 Alternatively, overloading the operator new works as usual without the need of defining custom allocators.
+
+### Does MagicFunc use RTTI?
+
+MagicFunc does not use C++'s RTTI, but its own faster alternative that provides unique integer values for each type within the current process.
+
+```c++
+using TypeId = intptr_t;
+
+template <typename... T>
+constexpr TypeId GetTypeId() noexcept {
+  // The double reinterpret_cast is to workaround a MSVC compiler error.
+  return reinterpret_cast<TypeId>(reinterpret_cast<void*>(&GetTypeId<T...>));
+}
+```
+
+There is an exception, though. Visual Studio in Release mode enables the COMDAT folding Linker optimization by default ([/OPT:ICF](https://docs.microsoft.com/en-us/cpp/build/reference/opt-optimizations)) which merges together multiple identical functions into the same address, even if such address is being used within the code (which is not standard-compliant). This causes the ids for all types to collapse to one same value, making MagicFunc fail.
+
+To avoid this problem, Visual Studio Release builds use this alternative approach by default.
+
+```c++
+template <typename... T>
+TypeId GetTypeId() noexcept {
+  static uint8_t id;
+  return reinterpret_cast<TypeId>(&id);
+}
+```
+
+Note that unlike the first one, this other approach is not constexpr because of the function static variable. To use the original method in Visual Studio Release builds, disable COMDAT folding in Project Settings -> Linker -> Optimization, or pass the [/OPT:NOICF](https://docs.microsoft.com/en-us/cpp/build/reference/opt-optimizations) linker argument. Then define the MSC\_OPT\_NOICF macro to let MagicFunc know it can proceed safely.
+
+However, in both cases do keep in mind that the returned type ids should not:
+1. Be serialized.
+2. Be shared across processes.
+3. Be used across Windows DLL boundaries.
+
+This is because, even if internally consistent, there is no guarantee that the values will be the same outside these boundaries.
+
