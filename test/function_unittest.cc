@@ -52,7 +52,7 @@ using namespace mf::test;
 // https://llvm.org/bugs/show_bug.cgi?id=23647
 //
 // Define this macro in order to disable such tests.
-#define DISABLE_VOLATILE_SHARED_PTRS
+//#define DISABLE_VOLATILE_SHARED_PTRS
 
 TEST(Function, Empty) {
   Function<void()> function;
