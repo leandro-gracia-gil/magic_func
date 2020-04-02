@@ -250,7 +250,7 @@ auto bar_2 = mf::Function<int(void)>::FromMemberFunction<const Object, &Object::
 MagicFunc is a header-only library, so you only need to copy the contents of the include folder somewhere in your include path.
 No dependencies are required to use MagicFunc. The googletest library is used for unit testing, but it's not required otherwise.
 
-### Is there anything that std::function supports but mf::Function or mf::MemberFunction do not?
+### Is there anything that std::function can do but mf::Function or mf::MemberFunction doesn't?
 
 Yes, mf::Function and mf::MemberFunction cannot take function or member function pointers, but only explicit function addresses that have linkage. This is because the addresses are passed as template arguments.
 Supporting function and member function pointers is possible, but it would require practices that are non-compliant with the standard (member function pointers cannot be type-erased) and would affect overall performance.
@@ -287,6 +287,8 @@ auto bar3 = mf::MakeFunction([&object, bar_ptr](int arg) { return (object.*bar_p
 bar3(42);
 ```
 
+On the other hand, std::function does not support type erasure. For example, you cannot store std::function of different signatures in a std::vector or std::map, which is a typical use case for event systems. With MagicFunc you can thanks to mf::TypeErasedFunction.
+
 ### Is there a mf::Bind or some alternative to std::bind?
 
 There's no mf::Bind because we consider it's not worth the complexity it brings to the code when a simple lambda can be used instead. Using std::bind can be more error-prone than it seems.
@@ -317,7 +319,7 @@ bar2(64);
 ### When should MF_MakeFunction and mf::MakeFunction be used?
 
 Actually, one uses the other. MF_MakeFunction is just a macro that saves us some syntax ugliness that we would otherwise have trying to pass function pointers as template arguments.
-In general the rule of thumb is: if you are passing a function or member function address directly use the **MF_MakeFunction** macro. Otherwise (like passing lambdas and mf::MemberFunction objects) use **mf::MakeFunction**.
+In general the rule of thumb is: if you are passing a function or member function address directly use the **MF_MakeFunction** macro. Otherwise use **mf::MakeFunction**.
 ```c++
 class Object {
  public:
@@ -331,14 +333,19 @@ auto foo1 = MF_MakeFunction(&Object::Foo, &object);  // Returns a mf::Function<v
 auto foo2 = mf::MakeFunction<decltype(&Object::Foo), &Object::Foo>(&object);
 
 // Then, this is what mf::MakeFunction is avoiding you to do manually.
+// Keep it simple and just use MF_MakeFunction to avoid this.
 auto foo3 = mf::Function<void(int)>::FromMemberFunction<Object, &Object::Foo>(&object);
 
-// When not passing a function address, like when using lambdas, just use mf::MakeFunction directly instead.
-auto bar = mf::MakeFunction([](int x, int y) { return x + y; });
+// When using a member function address use MF_MakeFunction.
+auto member_function = MF_MakeFunction(&Object::Foo);    // Returns a mf::MemberFunction<decltype(&Object::Foo)>.
 
-// Also the same when using mf::MemberFunction.
-mf::MemberFunction<decltype(&Object::Foo)> member_function = MF_MakeFunction(&Object::Foo);
+// However, when using mf::MemberFunction as an argument use mf::MakeFunction instead.
 auto foo4 = mf::MakeFunction(member_function, &object);  // Returns a mf::Function<void(int)>.
+
+// In the case of lambdas and other callables you can use mf::MakeFunction,
+// but assigning them directly also works if you specify the function type.
+auto bar1 = mf::MakeFunction([](int x, int y) { return x + y; });
+mf::Function<int(int, int)> bar2 = [](int x, int y) { return x + y; };
 ```
 
 ### How does MagicFunc perform against other std::function alternatives like impossibly fast delegates?
