@@ -418,3 +418,5 @@ However, in both cases do keep in mind that the returned type ids should not:
 
 This is because, even if internally consistent, there is no guarantee that the values will be the same outside these boundaries.
 
+Note that this also applies to anything using type ids, like function casts or assignment of type-erased functions.
+
