@@ -83,7 +83,6 @@ class TypeErasedFunction {
   inline TypeErasedFunction& operator =(std::nullptr_t);
 
  protected:
- public:
   // Type-erased versions of functions.
   using TypeErasedFuncPtr = void (*)();
 
