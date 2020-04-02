@@ -383,6 +383,23 @@ However, note that allocators are set globally (statically) for all MagicFunc. A
 
 Alternatively, overloading the operator new works as usual without the need of defining custom allocators.
 
+### What's the size of mf::Function objects?
+
+mf::Function and mf::MemberFunction objects are stateless template wrappers over mf::TypeErasedFunction, which actually contains the relevant data.
+
+The current size of a mf::TypeErasedFunction is 8 pointers (64 bytes for 64-bit architectures, 32 bytes for 32-bit architectures). This might seem excesive at first compared to other fast delegate implementations, but it is actually needed to correctly support type erasure with lambdas and associated objects.
+
+These pointers are structured as follows:
+- **1 pointer**: the unique id for the function type, based on MagicFunc's own RTTI ids (see below). Has type intptr_t.
+- **1 pointer**: a type-erased function that, when called, can restore the real function type and perform a call.
+- **1 pointer**: an associated external object or lambda, if any.
+- **2 pointers**: a local data buffer big enough to hold either a std::unique_ptr (for lambdas) or a std::shared_ptr (for objects).
+- **1 pointer**: a type-erased function for correctly destroying locally stored smart pointers.
+- **1 pointer**: a type-erased function for correctly moving lambdas or objects referred by locally stored smart pointers.
+- **1 pointer**: a type-erased function for correctly copying lambdas referred by locally stored unique pointers, or for copying locally referred shared pointers.
+
+Note that lambda functions also behave like associated objects since they can have a captured state, which must be also copied and moved accordingly when mf::TypeErasedFunctions are. However, since mf::TypeErasedFunctions do not hold type information they need to resort to auxiliary functions that know the actual type and can perform the appropriate operations. This is why mf::TypeErasedFunction objects require these additional pointers.
+
 ### Does MagicFunc use RTTI?
 
 MagicFunc does not use C++'s RTTI, but its own faster alternative that provides unique integer values for each type within the current process.
@@ -409,7 +426,7 @@ TypeId GetTypeId() noexcept {
 }
 ```
 
-Note that unlike the first one, this other approach is not constexpr because of the function static variable. To use the original method in Visual Studio Release builds, disable COMDAT folding in Project Settings -> Linker -> Optimization, or pass the [/OPT:NOICF](https://docs.microsoft.com/en-us/cpp/build/reference/opt-optimizations) linker argument. Then define the MSC\_OPT\_NOICF macro to let MagicFunc know it can proceed safely.
+Note that unlike the first one, this other approach is not constexpr because of the function static variable. To use the original method in Visual Studio Release builds, disable COMDAT folding in Project Settings -> Linker -> Optimization, or pass the [/OPT:NOICF](https://docs.microsoft.com/en-us/cpp/build/reference/opt-optimizations) linker argument. Then define the **MSC\_OPT\_NOICF** macro to let MagicFunc know it can proceed safely.
 
 However, in both cases do keep in mind that the returned type ids should not:
 1. Be serialized.
