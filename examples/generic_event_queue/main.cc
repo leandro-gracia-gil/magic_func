@@ -66,7 +66,7 @@ int main() {
   std::cout << "Value is now " << value << " after dispatch." << std::endl;
   assert(value == 7);
 
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402L || (defined(_MSC_VER) && _MSC_VER >= 1900)
   // There are a few more things we can do if we have C++14 support.
   // These are possible because of C++14 generalized lambda captures, which
   // allow moving objects into lambdas instead of only copying them.
@@ -125,7 +125,7 @@ int main() {
 
   // Dispatch the enqueued events.
   event_queue.Dispatch();
-#endif  // __cplusplus >= 201402L
+#endif  // __cplusplus >= 201402L || (defined(_MSC_VER) && _MSC_VER >= 1900)
 
   return 0;
 }

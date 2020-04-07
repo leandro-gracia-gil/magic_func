@@ -35,7 +35,7 @@
 #include <type_traits>
 
 // Define shortchut template aliases provided by C++14 if not already defined.
-#if __cplusplus < 201402L
+#if __cplusplus < 201402L && (!defined(_MSC_VER) || _MSC_VER < 1900)
 namespace std {
 
 template <typename T>
@@ -63,7 +63,7 @@ template <typename T>
 using remove_reference_t = typename remove_reference<T>::type;
 
 }  // namespace std
-#endif
+#endif  // __cplusplus < 201402L && (!defined(_MSC_VER) || _MSC_VER < 1900)
 
 namespace mf {
 

@@ -121,7 +121,7 @@ TEST(GenericEventQueue, DispatchEventLvalueReference) {
   EXPECT_EQ(42, x);
 }
 
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402L || (defined(_MSC_VER) && _MSC_VER >= 1900)
 TEST(GenericEventQueue, DispatchEventNonCopyable) {
   GenericEventQueue event_queue;
   std::vector<int> called;
@@ -192,7 +192,7 @@ TEST(GenericEventQueue, DispatchEventRvalueReference) {
   for (size_t i = 0; i < called.size(); ++i)
     EXPECT_EQ(i, called[i]);
 }
-#endif  // __cplusplus >= 201402L
+#endif  // __cplusplus >= 201402L || (defined(_MSC_VER) && _MSC_VER >= 1900)
 
 TEST(GenericEventQueue, DispatchEventMultipleListeners) {
   // Some compiler optimizations can merge functions with identical content like

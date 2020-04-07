@@ -199,7 +199,7 @@ class GenericEventQueue {
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     auto event_pair = std::make_pair(
         reinterpret_cast<void*>(event),
-#if __cplusplus < 201402L
+#if __cplusplus < 201402L && (!defined(_MSC_VER) || _MSC_VER < 1900)
         // In C++11 we copy the argument tuple after conversion.
         [args_tuple]
 #else

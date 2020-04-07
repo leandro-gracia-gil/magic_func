@@ -31,7 +31,7 @@
 #define MAGIC_FUNC_EXAMPLES_GENERIC_EVENT_QUEUE_CPP14_HELPERS_H_
 
 // Implementation of C++14 STL helper functions for C++11.
-#if __cplusplus < 201402L
+#if __cplusplus < 201402L && (!defined(_MSC_VER) || _MSC_VER < 1900)
 namespace std {
 
 template <size_t I, typename T>
@@ -40,11 +40,6 @@ using tuple_element_t = typename tuple_element<I, T>::type;
 template <typename T>
 using result_of_t = typename result_of<T>::type;
 
-// Visual Studio 2015 already has a definition of std::integer_sequence and
-// other related classes such as std::index_sequence.
-#if defined(_MSC_VER) && _MSC_VER >= 1900
-#include <utility>
-#else
 template <typename T, T... Ints>
 class integer_sequence {
  public:
@@ -98,9 +93,8 @@ using make_index_sequence = make_integer_sequence<size_t, N>;
 
 template <typename... T>
 using index_sequence_for = make_index_sequence<sizeof...(T)>;
-#endif  // !defined(_MSC_VER) || _MSC_VER < 1900
 
 }  // namespace std
-#endif  // __cplusplus < 201402L
+#endif  // __cplusplus < 201402L && (!defined(_MSC_VER) || _MSC_VER < 1900)
 
 #endif  // MAGIC_FUNC_EXAMPLES_GENERIC_EVENT_QUEUE_CPP14_HELPERS_H_
