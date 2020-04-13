@@ -415,9 +415,9 @@ MagicFunc does not use C++'s RTTI, but its own faster alternative that provides 
 using TypeId = intptr_t;
 
 template <typename... T>
-constexpr TypeId GetTypeId() noexcept {
+constexpr TypeId get_type_id() noexcept {
   // The double reinterpret_cast is to workaround a MSVC compiler error.
-  return reinterpret_cast<TypeId>(reinterpret_cast<void*>(&GetTypeId<T...>));
+  return reinterpret_cast<TypeId>(reinterpret_cast<void*>(&get_type_id<T...>));
 }
 ```
 
@@ -427,7 +427,7 @@ To avoid this problem, Visual Studio Release builds use this alternative approac
 
 ```c++
 template <typename... T>
-TypeId GetTypeId() noexcept {
+TypeId get_type_id() noexcept {
   static uint8_t id;
   return reinterpret_cast<TypeId>(&id);
 }

@@ -38,13 +38,13 @@ namespace mf {
 // Default constructor.
 template <typename MemberFuncPtr>
 MemberFunction<MemberFuncPtr>::MemberFunction() noexcept
-    : TypeErasedFunction(GetTypeId<MemberFuncPtr>()) {}
+    : TypeErasedFunction(get_type_id<MemberFuncPtr>()) {}
 
 // Constructor used by factory methods taking member functions addresses.
 template <typename MemberFuncPtr>
 MemberFunction<MemberFuncPtr>::MemberFunction(
     TypeErasedFunction::TypeErasedFuncPtr member_func_ptr) noexcept
-    : TypeErasedFunction(GetTypeId<MemberFuncPtr>(), member_func_ptr) {}
+    : TypeErasedFunction(get_type_id<MemberFuncPtr>(), member_func_ptr) {}
 
 template <typename MemberFuncPtr>
 template <MemberFuncPtr member_func_ptr>

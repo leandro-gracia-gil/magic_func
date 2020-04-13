@@ -58,7 +58,7 @@ TEST(Function, Empty) {
   Function<void()> function;
   EXPECT_FALSE(function);
   EXPECT_EQ(nullptr, function.GetObject());
-  EXPECT_EQ(GetTypeId<void()>(), function.type_id());
+  EXPECT_EQ(get_type_id<void()>(), function.type_id());
 
   // Test calling an empty function.
   try {
@@ -77,7 +77,7 @@ TEST(Function, FreeFunctionCall) {
 
   EXPECT_TRUE(function);
   EXPECT_EQ(nullptr, function.GetObject());
-  EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+  EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
   bool called = false;
   EXPECT_EQ(42, function(called, true));
@@ -99,7 +99,7 @@ TEST(Function, FreeFunctionCall) {
   function = nullptr;
   EXPECT_FALSE(function);
   EXPECT_EQ(nullptr, function.GetObject());
-  EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+  EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 }
 
 TEST(Function, LambdaCall) {
@@ -113,7 +113,7 @@ TEST(Function, LambdaCall) {
   Function<int(bool&, bool&&)> function(lambda);
   EXPECT_TRUE(function);
   EXPECT_NE(nullptr, function.GetObject());
-  EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+  EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
   bool called = false;
   EXPECT_EQ(id, function(called, true));
@@ -167,7 +167,7 @@ TEST(Function, LambdaCall) {
   function = nullptr;
   EXPECT_FALSE(function);
   EXPECT_EQ(nullptr, function.GetObject());
-  EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+  EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 }
 
 TEST(Function, LambdaConvertible) {
@@ -273,7 +273,7 @@ TEST(Function, FromMemberFunctionAndObjectPointer) {
   EXPECT_FALSE(decltype(member_function)::kIsConst);
   EXPECT_FALSE(decltype(member_function)::kIsVolatile);
   EXPECT_EQ(nullptr, member_function.GetObject());
-  EXPECT_EQ((GetTypeId<decltype(&Object::Function)>()),
+  EXPECT_EQ((get_type_id<decltype(&Object::Function)>()),
             member_function.type_id());
 
   // Create a MemberFunction pointing to a const member function.
@@ -283,7 +283,7 @@ TEST(Function, FromMemberFunctionAndObjectPointer) {
   EXPECT_TRUE(decltype(const_member_function)::kIsConst);
   EXPECT_FALSE(decltype(const_member_function)::kIsVolatile);
   EXPECT_EQ(nullptr, const_member_function.GetObject());
-  EXPECT_EQ((GetTypeId<decltype(&Object::ConstFunction)>()),
+  EXPECT_EQ((get_type_id<decltype(&Object::ConstFunction)>()),
             const_member_function.type_id());
 
   // Create a MemberFunction pointing to a volatile member function.
@@ -293,7 +293,7 @@ TEST(Function, FromMemberFunctionAndObjectPointer) {
   EXPECT_FALSE(decltype(volatile_member_function)::kIsConst);
   EXPECT_TRUE(decltype(volatile_member_function)::kIsVolatile);
   EXPECT_EQ(nullptr, volatile_member_function.GetObject());
-  EXPECT_EQ((GetTypeId<decltype(&Object::VolatileFunction)>()),
+  EXPECT_EQ((get_type_id<decltype(&Object::VolatileFunction)>()),
             volatile_member_function.type_id());
 
   // Create a MemberFunction pointing to a const_volatile member function.
@@ -305,7 +305,7 @@ TEST(Function, FromMemberFunctionAndObjectPointer) {
   EXPECT_TRUE(decltype(const_volatile_member_function)::kIsConst);
   EXPECT_TRUE(decltype(const_volatile_member_function)::kIsVolatile);
   EXPECT_EQ(nullptr, const_volatile_member_function.GetObject());
-  EXPECT_EQ((GetTypeId<decltype(&Object::ConstVolatileFunction)>()),
+  EXPECT_EQ((get_type_id<decltype(&Object::ConstVolatileFunction)>()),
             const_volatile_member_function.type_id());
 
   {
@@ -317,7 +317,7 @@ TEST(Function, FromMemberFunctionAndObjectPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(&object, function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -333,7 +333,7 @@ TEST(Function, FromMemberFunctionAndObjectPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(&object, function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -349,7 +349,7 @@ TEST(Function, FromMemberFunctionAndObjectPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(&object, function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -366,7 +366,7 @@ TEST(Function, FromMemberFunctionAndObjectPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(&object, function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -382,7 +382,7 @@ TEST(Function, FromMemberFunctionAndObjectPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(&object, function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -399,7 +399,7 @@ TEST(Function, FromMemberFunctionAndObjectPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(&object, function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -415,7 +415,7 @@ TEST(Function, FromMemberFunctionAndObjectPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(&object, function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -432,7 +432,7 @@ TEST(Function, FromMemberFunctionAndObjectPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(&object, function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -448,7 +448,7 @@ TEST(Function, FromMemberFunctionAndObjectPointer) {
     auto function_copy = function;
     EXPECT_TRUE(function_copy);
     EXPECT_EQ(&object, function_copy.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function_copy.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function_copy.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function_copy(called, true));
@@ -457,7 +457,7 @@ TEST(Function, FromMemberFunctionAndObjectPointer) {
     auto function_move = std::move(function_copy);
     EXPECT_TRUE(function_move);
     EXPECT_EQ(&object, function_move.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function_move.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function_move.type_id());
 
     called = false;
     EXPECT_EQ(id, function_move(called, true));
@@ -482,7 +482,7 @@ TEST(Function, FromMemberFunctionAndObjectPointerVirtual) {
 
   EXPECT_TRUE(member_function);
   EXPECT_EQ(nullptr, member_function.GetObject());
-  EXPECT_EQ((GetTypeId<decltype(&Object::VirtualFunction)>()),
+  EXPECT_EQ((get_type_id<decltype(&Object::VirtualFunction)>()),
             member_function.type_id());
 
   {
@@ -492,7 +492,7 @@ TEST(Function, FromMemberFunctionAndObjectPointerVirtual) {
     Function<int(bool&, bool&&, bool*)> function(member_function, &object);
     EXPECT_TRUE(function);
     EXPECT_EQ(&object, function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&, bool*)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&, bool*)>()), function.type_id());
 
     bool called = false;
     bool derived = false;
@@ -509,7 +509,7 @@ TEST(Function, FromMemberFunctionAndObjectPointerVirtual) {
         member_function, &derived_object);
     EXPECT_TRUE(function);
     EXPECT_EQ(&derived_object, function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&, bool*)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&, bool*)>()), function.type_id());
 
     bool called = false;
     bool derived = false;
@@ -527,7 +527,7 @@ TEST(Function, FromMemberFunctionAndSharedPointer) {
   EXPECT_FALSE(decltype(member_function)::kIsConst);
   EXPECT_FALSE(decltype(member_function)::kIsVolatile);
   EXPECT_EQ(nullptr, member_function.GetObject());
-  EXPECT_EQ((GetTypeId<decltype(&Object::Function)>()),
+  EXPECT_EQ((get_type_id<decltype(&Object::Function)>()),
             member_function.type_id());
 
   // Create a MemberFunction pointing to a const member function.
@@ -537,7 +537,7 @@ TEST(Function, FromMemberFunctionAndSharedPointer) {
   EXPECT_TRUE(decltype(const_member_function)::kIsConst);
   EXPECT_FALSE(decltype(const_member_function)::kIsVolatile);
   EXPECT_EQ(nullptr, const_member_function.GetObject());
-  EXPECT_EQ((GetTypeId<decltype(&Object::ConstFunction)>()),
+  EXPECT_EQ((get_type_id<decltype(&Object::ConstFunction)>()),
             const_member_function.type_id());
 
   // Create a MemberFunction pointing to a volatile member function.
@@ -547,7 +547,7 @@ TEST(Function, FromMemberFunctionAndSharedPointer) {
   EXPECT_FALSE(decltype(volatile_member_function)::kIsConst);
   EXPECT_TRUE(decltype(volatile_member_function)::kIsVolatile);
   EXPECT_EQ(nullptr, volatile_member_function.GetObject());
-  EXPECT_EQ((GetTypeId<decltype(&Object::VolatileFunction)>()),
+  EXPECT_EQ((get_type_id<decltype(&Object::VolatileFunction)>()),
             volatile_member_function.type_id());
 
   // Create a MemberFunction pointing to a const_volatile member function.
@@ -559,7 +559,7 @@ TEST(Function, FromMemberFunctionAndSharedPointer) {
   EXPECT_TRUE(decltype(const_volatile_member_function)::kIsConst);
   EXPECT_TRUE(decltype(const_volatile_member_function)::kIsVolatile);
   EXPECT_EQ(nullptr, const_volatile_member_function.GetObject());
-  EXPECT_EQ((GetTypeId<decltype(&Object::ConstVolatileFunction)>()),
+  EXPECT_EQ((get_type_id<decltype(&Object::ConstVolatileFunction)>()),
             const_volatile_member_function.type_id());
 
   {
@@ -571,7 +571,7 @@ TEST(Function, FromMemberFunctionAndSharedPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(object.get(), function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -587,7 +587,7 @@ TEST(Function, FromMemberFunctionAndSharedPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(object.get(), function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -603,7 +603,7 @@ TEST(Function, FromMemberFunctionAndSharedPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(object.get(), function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -620,7 +620,7 @@ TEST(Function, FromMemberFunctionAndSharedPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(object.get(), function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -636,7 +636,7 @@ TEST(Function, FromMemberFunctionAndSharedPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(object.get(), function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -653,7 +653,7 @@ TEST(Function, FromMemberFunctionAndSharedPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(object.get(), function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -670,7 +670,7 @@ TEST(Function, FromMemberFunctionAndSharedPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(object.get(), function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -687,7 +687,7 @@ TEST(Function, FromMemberFunctionAndSharedPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(object.get(), function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -705,7 +705,7 @@ TEST(Function, FromMemberFunctionAndSharedPointer) {
     auto function_copy = function;
     EXPECT_TRUE(function_copy);
     EXPECT_EQ(object.get(), function_copy.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function_copy.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function_copy.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function_copy(called, true));
@@ -714,7 +714,7 @@ TEST(Function, FromMemberFunctionAndSharedPointer) {
     auto function_move = std::move(function_copy);
     EXPECT_TRUE(function_move);
     EXPECT_EQ(object.get(), function_move.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function_move.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function_move.type_id());
 
     called = false;
     EXPECT_EQ(id, function_move(called, true));
@@ -751,7 +751,7 @@ TEST(Function, FromMemberFunctionAndSharedPointerVirtual) {
 
   EXPECT_TRUE(member_function);
   EXPECT_EQ(nullptr, member_function.GetObject());
-  EXPECT_EQ((GetTypeId<decltype(&Object::VirtualFunction)>()),
+  EXPECT_EQ((get_type_id<decltype(&Object::VirtualFunction)>()),
             member_function.type_id());
 
   {
@@ -761,7 +761,7 @@ TEST(Function, FromMemberFunctionAndSharedPointerVirtual) {
     Function<int(bool&, bool&&, bool*)> function(member_function, object);
     EXPECT_TRUE(function);
     EXPECT_EQ(object.get(), function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&, bool*)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&, bool*)>()), function.type_id());
 
     bool called = false;
     bool derived = false;
@@ -778,7 +778,7 @@ TEST(Function, FromMemberFunctionAndSharedPointerVirtual) {
         member_function, derived_object);
     EXPECT_TRUE(function);
     EXPECT_EQ(derived_object.get(), function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&, bool*)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&, bool*)>()), function.type_id());
 
     bool called = false;
     bool derived = false;
@@ -798,7 +798,7 @@ TEST(Function, FromFunctionAddressAndObjectPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(&object, function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -814,7 +814,7 @@ TEST(Function, FromFunctionAddressAndObjectPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(&object, function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -830,7 +830,7 @@ TEST(Function, FromFunctionAddressAndObjectPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(&object, function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -846,7 +846,7 @@ TEST(Function, FromFunctionAddressAndObjectPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(&object, function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -862,7 +862,7 @@ TEST(Function, FromFunctionAddressAndObjectPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(&object, function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -878,7 +878,7 @@ TEST(Function, FromFunctionAddressAndObjectPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(&object, function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -894,7 +894,7 @@ TEST(Function, FromFunctionAddressAndObjectPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(&object, function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -910,7 +910,7 @@ TEST(Function, FromFunctionAddressAndObjectPointer) {
     auto function_copy = function;
     EXPECT_TRUE(function_copy);
     EXPECT_EQ(&object, function_copy.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function_copy.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function_copy.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function_copy(called, true));
@@ -919,7 +919,7 @@ TEST(Function, FromFunctionAddressAndObjectPointer) {
     auto function_move = std::move(function_copy);
     EXPECT_TRUE(function_move);
     EXPECT_EQ(&object, function_move.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function_move.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function_move.type_id());
 
     called = false;
     EXPECT_EQ(id, function_move(called, true));
@@ -946,7 +946,7 @@ TEST(Function, FromFunctionAddressAndObjectPointerVirtual) {
     auto function = MF_MakeFunction(&Object::VirtualFunction, &object);
     EXPECT_TRUE(function);
     EXPECT_EQ(&object, function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&, bool*)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&, bool*)>()), function.type_id());
 
     bool called = false;
     bool derived = false;
@@ -962,7 +962,7 @@ TEST(Function, FromFunctionAddressAndObjectPointerVirtual) {
     auto function = MF_MakeFunction(&Object::VirtualFunction, &derived_object);
     EXPECT_TRUE(function);
     EXPECT_EQ(&derived_object, function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&, bool*)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&, bool*)>()), function.type_id());
 
     bool called = false;
     bool derived = false;
@@ -1061,7 +1061,7 @@ TEST(Function, FromFunctionAddressAndSharedPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(object.get(), function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -1077,7 +1077,7 @@ TEST(Function, FromFunctionAddressAndSharedPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(object.get(), function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -1093,7 +1093,7 @@ TEST(Function, FromFunctionAddressAndSharedPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(object.get(), function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -1109,7 +1109,7 @@ TEST(Function, FromFunctionAddressAndSharedPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(object.get(), function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -1125,7 +1125,7 @@ TEST(Function, FromFunctionAddressAndSharedPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(object.get(), function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -1142,7 +1142,7 @@ TEST(Function, FromFunctionAddressAndSharedPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(object.get(), function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -1158,7 +1158,7 @@ TEST(Function, FromFunctionAddressAndSharedPointer) {
 
     EXPECT_TRUE(function);
     EXPECT_EQ(object.get(), function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -1175,7 +1175,7 @@ TEST(Function, FromFunctionAddressAndSharedPointer) {
     auto function_copy = function;
     EXPECT_TRUE(function_copy);
     EXPECT_EQ(object.get(), function_copy.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function_copy.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function_copy.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function_copy(called, true));
@@ -1184,7 +1184,7 @@ TEST(Function, FromFunctionAddressAndSharedPointer) {
     auto function_move = std::move(function_copy);
     EXPECT_TRUE(function_move);
     EXPECT_EQ(object.get(), function_move.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function_move.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function_move.type_id());
 
     called = false;
     EXPECT_EQ(id, function_move(called, true));
@@ -1223,7 +1223,7 @@ TEST(Function, FromFunctionAddressAndSharedPointerVirtual) {
     auto function = MF_MakeFunction(&Object::VirtualFunction, object);
     EXPECT_TRUE(function);
     EXPECT_EQ(object.get(), function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&, bool*)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&, bool*)>()), function.type_id());
 
     bool called = false;
     bool derived = false;
@@ -1239,7 +1239,7 @@ TEST(Function, FromFunctionAddressAndSharedPointerVirtual) {
     auto function = MF_MakeFunction(&Object::VirtualFunction, derived_object);
     EXPECT_TRUE(function);
     EXPECT_EQ(derived_object.get(), function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&, bool*)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&, bool*)>()), function.type_id());
 
     bool called = false;
     bool derived = false;

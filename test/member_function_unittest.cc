@@ -46,7 +46,7 @@ TEST(MemberFunction, Empty) {
   MemberFunction<decltype(&Object::Function)> member_function;
   EXPECT_FALSE(member_function);
   EXPECT_EQ(nullptr, member_function.GetObject());
-  EXPECT_EQ(GetTypeId<decltype(&Object::Function)>(),
+  EXPECT_EQ(get_type_id<decltype(&Object::Function)>(),
             member_function.type_id());
 
   // Test calling an empty function.
@@ -68,7 +68,7 @@ TEST(MemberFunction, CallMemberFunction) {
 
   EXPECT_TRUE(member_function);
   EXPECT_EQ(nullptr, member_function.GetObject());
-  EXPECT_EQ(GetTypeId<decltype(&Object::Function)>(),
+  EXPECT_EQ(get_type_id<decltype(&Object::Function)>(),
             member_function.type_id());
 
   {
@@ -89,7 +89,7 @@ TEST(MemberFunction, CallMemberFunction) {
     auto member_function_copy = member_function;
     EXPECT_TRUE(member_function_copy);
     EXPECT_EQ(nullptr, member_function_copy.GetObject());
-    EXPECT_EQ(GetTypeId<decltype(&Object::Function)>(),
+    EXPECT_EQ(get_type_id<decltype(&Object::Function)>(),
               member_function_copy.type_id());
 
     bool called = false;
@@ -99,7 +99,7 @@ TEST(MemberFunction, CallMemberFunction) {
     auto member_function_move = std::move(member_function_copy);
     EXPECT_TRUE(member_function_move);
     EXPECT_EQ(nullptr, member_function_move.GetObject());
-    EXPECT_EQ(GetTypeId<decltype(&Object::Function)>(),
+    EXPECT_EQ(get_type_id<decltype(&Object::Function)>(),
               member_function_move.type_id());
 
     called = false;
@@ -114,7 +114,7 @@ TEST(MemberFunction, CallConstMemberFunction) {
 
   EXPECT_TRUE(member_function);
   EXPECT_EQ(nullptr, member_function.GetObject());
-  EXPECT_EQ(GetTypeId<decltype(&Object::ConstFunction)>(),
+  EXPECT_EQ(get_type_id<decltype(&Object::ConstFunction)>(),
             member_function.type_id());
 
   {
@@ -145,7 +145,7 @@ TEST(MemberFunction, CallConstMemberFunction) {
     auto member_function_copy = member_function;
     EXPECT_TRUE(member_function_copy);
     EXPECT_EQ(nullptr, member_function_copy.GetObject());
-    EXPECT_EQ(GetTypeId<decltype(&Object::ConstFunction)>(),
+    EXPECT_EQ(get_type_id<decltype(&Object::ConstFunction)>(),
               member_function_copy.type_id());
 
     bool called = false;
@@ -155,7 +155,7 @@ TEST(MemberFunction, CallConstMemberFunction) {
     auto member_function_move = std::move(member_function_copy);
     EXPECT_TRUE(member_function_move);
     EXPECT_EQ(nullptr, member_function_move.GetObject());
-    EXPECT_EQ(GetTypeId<decltype(&Object::ConstFunction)>(),
+    EXPECT_EQ(get_type_id<decltype(&Object::ConstFunction)>(),
               member_function_move.type_id());
 
     called = false;
@@ -170,7 +170,7 @@ TEST(MemberFunction, CallVolatileMemberFunction) {
 
   EXPECT_TRUE(member_function);
   EXPECT_EQ(nullptr, member_function.GetObject());
-  EXPECT_EQ(GetTypeId<decltype(&Object::VolatileFunction)>(),
+  EXPECT_EQ(get_type_id<decltype(&Object::VolatileFunction)>(),
             member_function.type_id());
 
   {
@@ -201,7 +201,7 @@ TEST(MemberFunction, CallVolatileMemberFunction) {
     auto member_function_copy = member_function;
     EXPECT_TRUE(member_function_copy);
     EXPECT_EQ(nullptr, member_function_copy.GetObject());
-    EXPECT_EQ(GetTypeId<decltype(&Object::VolatileFunction)>(),
+    EXPECT_EQ(get_type_id<decltype(&Object::VolatileFunction)>(),
               member_function_copy.type_id());
 
     bool called = false;
@@ -211,7 +211,7 @@ TEST(MemberFunction, CallVolatileMemberFunction) {
     auto member_function_move = std::move(member_function_copy);
     EXPECT_TRUE(member_function_move);
     EXPECT_EQ(nullptr, member_function_move.GetObject());
-    EXPECT_EQ(GetTypeId<decltype(&Object::VolatileFunction)>(),
+    EXPECT_EQ(get_type_id<decltype(&Object::VolatileFunction)>(),
               member_function_move.type_id());
 
     called = false;
@@ -226,7 +226,7 @@ TEST(MemberFunction, CallConstVolatileMemberFunction) {
 
   EXPECT_TRUE(member_function);
   EXPECT_EQ(nullptr, member_function.GetObject());
-  EXPECT_EQ(GetTypeId<decltype(&Object::ConstVolatileFunction)>(),
+  EXPECT_EQ(get_type_id<decltype(&Object::ConstVolatileFunction)>(),
             member_function.type_id());
 
   {
@@ -277,7 +277,7 @@ TEST(MemberFunction, CallConstVolatileMemberFunction) {
     auto member_function_copy = member_function;
     EXPECT_TRUE(member_function_copy);
     EXPECT_EQ(nullptr, member_function_copy.GetObject());
-    EXPECT_EQ(GetTypeId<decltype(&Object::ConstVolatileFunction)>(),
+    EXPECT_EQ(get_type_id<decltype(&Object::ConstVolatileFunction)>(),
               member_function_copy.type_id());
 
     bool called = false;
@@ -287,7 +287,7 @@ TEST(MemberFunction, CallConstVolatileMemberFunction) {
     auto member_function_move = std::move(member_function_copy);
     EXPECT_TRUE(member_function_move);
     EXPECT_EQ(nullptr, member_function_move.GetObject());
-    EXPECT_EQ(GetTypeId<decltype(&Object::ConstVolatileFunction)>(),
+    EXPECT_EQ(get_type_id<decltype(&Object::ConstVolatileFunction)>(),
               member_function_move.type_id());
 
     called = false;
@@ -302,7 +302,7 @@ TEST(MemberFunction, CallVirtualMemberFunction) {
 
   EXPECT_TRUE(member_function);
   EXPECT_EQ(nullptr, member_function.GetObject());
-  EXPECT_EQ(GetTypeId<decltype(&Object::VirtualFunction)>(),
+  EXPECT_EQ(get_type_id<decltype(&Object::VirtualFunction)>(),
             member_function.type_id());
 
   {

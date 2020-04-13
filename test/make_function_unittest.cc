@@ -43,7 +43,7 @@ TEST(MakeFunction, FunctionAddress) {
 
   EXPECT_TRUE(function);
   EXPECT_EQ(nullptr, function.GetObject());
-  EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+  EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
   bool called = false;
   EXPECT_EQ(42, function(called, true));
@@ -65,7 +65,7 @@ TEST(MakeFunction, Lambda) {
 
     EXPECT_TRUE(function);
     EXPECT_NE(nullptr, function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -85,7 +85,7 @@ TEST(MakeFunction, Lambda) {
 
     EXPECT_TRUE(function);
     EXPECT_NE(nullptr, function.GetObject());
-    EXPECT_EQ((GetTypeId<int(bool&, bool&&)>()), function.type_id());
+    EXPECT_EQ((get_type_id<int(bool&, bool&&)>()), function.type_id());
 
     bool called = false;
     EXPECT_EQ(id, function(called, true));
@@ -280,7 +280,7 @@ TEST(MakeFunction, MemberFunctionAddress) {
 
     EXPECT_TRUE(member_function);
     EXPECT_EQ(nullptr, member_function.GetObject());
-    EXPECT_EQ((GetTypeId<decltype(&Object::Function)>()),
+    EXPECT_EQ((get_type_id<decltype(&Object::Function)>()),
               member_function.type_id());
 
     int id = rand();
@@ -301,7 +301,7 @@ TEST(MakeFunction, MemberFunctionAddress) {
 
     EXPECT_TRUE(member_function);
     EXPECT_EQ(nullptr, member_function.GetObject());
-    EXPECT_EQ((GetTypeId<decltype(&Object::ConstFunction)>()),
+    EXPECT_EQ((get_type_id<decltype(&Object::ConstFunction)>()),
               member_function.type_id());
 
     int id = rand();
@@ -330,7 +330,7 @@ TEST(MakeFunction, MemberFunctionAddress) {
 
     EXPECT_TRUE(member_function);
     EXPECT_EQ(nullptr, member_function.GetObject());
-    EXPECT_EQ((GetTypeId<decltype(&Object::VolatileFunction)>()),
+    EXPECT_EQ((get_type_id<decltype(&Object::VolatileFunction)>()),
               member_function.type_id());
 
     int id = rand();
@@ -360,7 +360,7 @@ TEST(MakeFunction, MemberFunctionAddress) {
 
     EXPECT_TRUE(member_function);
     EXPECT_EQ(nullptr, member_function.GetObject());
-    EXPECT_EQ((GetTypeId<decltype(&Object::ConstVolatileFunction)>()),
+    EXPECT_EQ((get_type_id<decltype(&Object::ConstVolatileFunction)>()),
               member_function.type_id());
 
     int id = rand();

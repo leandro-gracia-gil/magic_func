@@ -38,7 +38,7 @@ namespace mf {
 // Default constructor.
 template <typename Return, typename... Args>
 Function<Return(Args...)>::Function() noexcept
-    : TypeErasedFunction(GetTypeId<FunctionType>()) {}
+    : TypeErasedFunction(get_type_id<FunctionType>()) {}
 
 // Factory method for function addresses.
 template <typename Return, typename... Args>
@@ -80,7 +80,7 @@ Function<Return(Args...)>::Function(
     std::enable_if_t<std::is_same<FunctionType,
         typename FunctionTraits<MemberFuncPtr>::FunctionType
         >::value>*)
-    : TypeErasedFunction(GetTypeId<FunctionType>()) {
+    : TypeErasedFunction(get_type_id<FunctionType>()) {
   // Class is qualified as the member function and Object as the object.
   // This enforces const compatibility and produces more useful build errors.
   typename FunctionTraits<MemberFuncPtr>::Class* class_ptr = object;
@@ -98,7 +98,7 @@ Function<Return(Args...)>::Function(
     std::enable_if_t<std::is_same<FunctionType,
         typename FunctionTraits<MemberFuncPtr>::FunctionType
         >::value>*)
-    : TypeErasedFunction(GetTypeId<FunctionType>()) {
+    : TypeErasedFunction(get_type_id<FunctionType>()) {
   // Class is qualified as the member function and Object as the object.
   // This enforces const compatibility and produces more useful build errors.
   using Class = typename FunctionTraits<MemberFuncPtr>::Class;
@@ -116,7 +116,7 @@ Function<Return(Args...)>::Function(
     std::enable_if_t<
         !IsFunction<Callable>::value && !IsMemberFunction<Callable>::value>*)
     : TypeErasedFunction(
-        GetTypeId<FunctionType>(),
+        get_type_id<FunctionType>(),
         reinterpret_cast<TypeErasedFuncPtr>(&CallCallable<Callable>)) {
   // Store the callable object within the function or owned by it in the heap.
   object_.StoreObject(std::forward<Callable>(callable));
@@ -126,7 +126,7 @@ Function<Return(Args...)>::Function(
 // member function addresses bound to objects.
 template <typename Return, typename... Args>
 Function<Return(Args...)>::Function(TypeErasedFuncPtr func_ptr) noexcept
-    : TypeErasedFunction(GetTypeId<FunctionType>(), func_ptr) {}
+    : TypeErasedFunction(get_type_id<FunctionType>(), func_ptr) {}
 
 // Assignment operator for compatible callable objects.
 template <typename Return, typename... Args>
