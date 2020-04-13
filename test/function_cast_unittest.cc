@@ -44,14 +44,14 @@
 using namespace mf;
 using namespace mf::test;
 
-TEST(FunctionCast, FunctionAddress) {
+TEST(function_cast, FunctionAddress) {
   // Test casting back from a type-erased Function pointing to a function
   // address.
   auto function = MF_MakeFunction(&FreeFunction);
   TypeErasedFunction type_erased = function;
   EXPECT_TRUE(type_erased);
 
-  auto casted_function = FunctionCast<int(bool&, bool&&)>(type_erased);
+  auto casted_function = function_cast<int(bool&, bool&&)>(type_erased);
   EXPECT_TRUE((std::is_same<decltype(casted_function),
               Function<int(bool&, bool&&)>>::value));
 
@@ -61,14 +61,14 @@ TEST(FunctionCast, FunctionAddress) {
 
   // Try catching a bad cast.
   try {
-    FunctionCast<int(bool, bool)>(type_erased);
+    function_cast<int(bool, bool)>(type_erased);
     FAIL();
   } catch (Error error) {
     EXPECT_EQ(Error::kInvalidCast, error);
   }
 }
 
-TEST(FunctionCast, FunctionCallable) {
+TEST(function_cast, FunctionCallable) {
   // Test casting back from a type-erased Function that calls a lambda.
   int id = rand();
   Function<int(bool&, bool&&)> function = [=](bool& called, bool&& value) {
@@ -79,7 +79,7 @@ TEST(FunctionCast, FunctionCallable) {
   TypeErasedFunction type_erased = function;
   EXPECT_TRUE(type_erased);
 
-  auto casted_function = FunctionCast<int(bool&, bool&&)>(type_erased);
+  auto casted_function = function_cast<int(bool&, bool&&)>(type_erased);
   EXPECT_TRUE((std::is_same<decltype(casted_function),
               Function<int(bool&, bool&&)>>::value));
 
@@ -89,14 +89,14 @@ TEST(FunctionCast, FunctionCallable) {
 
   // Try catching a bad cast.
   try {
-    FunctionCast<int(bool, bool)>(type_erased);
+    function_cast<int(bool, bool)>(type_erased);
     FAIL();
   } catch (Error error) {
     EXPECT_EQ(Error::kInvalidCast, error);
   }
 }
 
-TEST(FunctionCast, MemberFunctionAndObject) {
+TEST(function_cast, MemberFunctionAndObject) {
   auto member_function = MF_MakeFunction(&Object::Function);
 
   {
@@ -109,7 +109,7 @@ TEST(FunctionCast, MemberFunctionAndObject) {
     TypeErasedFunction type_erased = function;
     EXPECT_TRUE(type_erased);
 
-    auto casted_function = FunctionCast<int(bool&, bool&&)>(type_erased);
+    auto casted_function = function_cast<int(bool&, bool&&)>(type_erased);
     EXPECT_TRUE((std::is_same<decltype(casted_function),
                 Function<int(bool&, bool&&)>>::value));
 
@@ -119,7 +119,7 @@ TEST(FunctionCast, MemberFunctionAndObject) {
 
     // Try catching a bad cast.
     try {
-      FunctionCast<decltype(&Object::Function)>(type_erased);
+      function_cast<decltype(&Object::Function)>(type_erased);
       FAIL();
     } catch (Error error) {
       EXPECT_EQ(Error::kInvalidCast, error);
@@ -136,7 +136,7 @@ TEST(FunctionCast, MemberFunctionAndObject) {
     TypeErasedFunction type_erased = function;
     EXPECT_TRUE(type_erased);
 
-    auto casted_function = FunctionCast<int(bool&, bool&&)>(type_erased);
+    auto casted_function = function_cast<int(bool&, bool&&)>(type_erased);
     EXPECT_TRUE((std::is_same<decltype(casted_function),
                 Function<int(bool&, bool&&)>>::value));
 
@@ -146,7 +146,7 @@ TEST(FunctionCast, MemberFunctionAndObject) {
 
     // Try catching a bad cast.
     try {
-      FunctionCast<decltype(&Object::Function)>(type_erased);
+      function_cast<decltype(&Object::Function)>(type_erased);
       FAIL();
     } catch (Error error) {
       EXPECT_EQ(Error::kInvalidCast, error);
@@ -154,7 +154,7 @@ TEST(FunctionCast, MemberFunctionAndObject) {
   }
 }
 
-TEST(FunctionCast, MemberFunctionAddressAndObject) {
+TEST(function_cast, MemberFunctionAddressAndObject) {
   {
     // Test casting back from a type-erased Function built by binding a member
     // function address and an object pointer.
@@ -165,7 +165,7 @@ TEST(FunctionCast, MemberFunctionAddressAndObject) {
     TypeErasedFunction type_erased = function;
     EXPECT_TRUE(type_erased);
 
-    auto casted_function = FunctionCast<int(bool&, bool&&)>(type_erased);
+    auto casted_function = function_cast<int(bool&, bool&&)>(type_erased);
     EXPECT_TRUE((std::is_same<decltype(casted_function),
                 Function<int(bool&, bool&&)>>::value));
 
@@ -175,7 +175,7 @@ TEST(FunctionCast, MemberFunctionAddressAndObject) {
 
     // Try catching a bad cast.
     try {
-      FunctionCast<decltype(&Object::Function)>(type_erased);
+      function_cast<decltype(&Object::Function)>(type_erased);
       FAIL();
     } catch (Error error) {
       EXPECT_EQ(Error::kInvalidCast, error);
@@ -192,7 +192,7 @@ TEST(FunctionCast, MemberFunctionAddressAndObject) {
     TypeErasedFunction type_erased = function;
     EXPECT_TRUE(type_erased);
 
-    auto casted_function = FunctionCast<int(bool&, bool&&)>(type_erased);
+    auto casted_function = function_cast<int(bool&, bool&&)>(type_erased);
     EXPECT_TRUE((std::is_same<decltype(casted_function),
                 Function<int(bool&, bool&&)>>::value));
 
@@ -202,7 +202,7 @@ TEST(FunctionCast, MemberFunctionAddressAndObject) {
 
     // Try catching a bad cast.
     try {
-      FunctionCast<decltype(&Object::Function)>(type_erased);
+      function_cast<decltype(&Object::Function)>(type_erased);
       FAIL();
     } catch (Error error) {
       EXPECT_EQ(Error::kInvalidCast, error);
@@ -210,14 +210,14 @@ TEST(FunctionCast, MemberFunctionAddressAndObject) {
   }
 }
 
-TEST(FunctionCast, MemberFunctionAddress) {
+TEST(function_cast, MemberFunctionAddress) {
   // Test casting back from a type-erased MemberFunction built from a member
   // function address.
   auto member_function = MF_MakeFunction(&Object::Function);
   TypeErasedFunction type_erased = member_function;
   EXPECT_TRUE(type_erased);
 
-  auto casted_function = FunctionCast<decltype(&Object::Function)>(type_erased);
+  auto casted_function = function_cast<decltype(&Object::Function)>(type_erased);
   EXPECT_TRUE((std::is_same<decltype(casted_function),
               MemberFunction<decltype(&Object::Function)>>::value));
 
@@ -230,7 +230,7 @@ TEST(FunctionCast, MemberFunctionAddress) {
 
   // Try catching a bad cast.
   try {
-    FunctionCast<decltype(&Object::ConstFunction)>(type_erased);
+    function_cast<decltype(&Object::ConstFunction)>(type_erased);
     FAIL();
   } catch (Error error) {
     EXPECT_EQ(Error::kInvalidCast, error);

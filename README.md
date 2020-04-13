@@ -29,7 +29,7 @@ MagicFunc has two main classes:
 - **mf::MemberFunction<*member_function_pointer_type*\>**: allows calling a member function of a class, provided an object.
 
 Both classes derive from **mf::TypeErasedFunction**, which holds all the required information. Type-erased functions can be safely copied and moved but not invoked.
-To cast back to a mf::Function or a mf::MemberFunction, **mf::FunctionCast** must be used. This performs a fast runtime type check to ensure the cast is valid and raises an error otherwise.
+To cast back to a mf::Function or a mf::MemberFunction, **mf::function_cast** must be used. This performs a fast runtime type check to ensure the cast is valid and raises an error otherwise.
 
  MagicFunc features automatic type deduction for functions that are not overloaded. This can be done by  calling **mf::MakeFunction**, which will return a mf::Function or a mf::MemberFunction object depending on the provided arguments.
 When trying to use mf::MakeFunction with explicit function addresses (not pointers) it's simpler to use the auxiliary macro **MF_MakeFunction**. This macro simplifies the syntax involved in passing the function address as a template argument.
@@ -176,21 +176,21 @@ std::vector<mf::TypeErasedFunction> many_functions = { foo_member_func, foo, bar
 mf::TypeErasedFunction type_erased_foo = many_functions[1];
 mf::TypeErasedFunction type_erased_bar = std::move(many_functions[2]);
 
-// We can undo type erasure by using mf::FunctionCast.
-auto foo_restored = mf::FunctionCast<int(int)>(type_erased_foo);  // Returns a mf::Function<int(int)>.
+// We can undo type erasure by using mf::function_cast.
+auto foo_restored = mf::function_cast<int(int)>(type_erased_foo);  // Returns a mf::Function<int(int)>.
 foo_restored(42);
 
 Object object;
-auto foo_func_restored = mf::FunctionCast<decltype(&Object::Foo)>(many_functions[0]);  // Returns a mf::MemberFunction<decltype(&Object::Foo)>.
+auto foo_func_restored = mf::function_cast<decltype(&Object::Foo)>(many_functions[0]);  // Returns a mf::MemberFunction<decltype(&Object::Foo)>.
 foo_func_restored(object, 42);
 
-// However, note that a runtime type check is performed when calling mf::FunctionCast.
+// However, note that a runtime type check is performed when calling mf::function_cast.
 // If we try something invalid we will get an error. What this error does depends on our error.h configuration and the type of build.
 // By default, exceptions are disabled if the NDEBUG macro is defined. This is usual in release builds.
 // If exceptions are enabled then we can catch the failure. If they are not we would terminate.
 // For illustrative purposes let's assume exceptions are enabled.
 try {
-  auto invalid_cast = mf::FunctionCast<void()>(type_erased_foo);
+  auto invalid_cast = mf::function_cast<void()>(type_erased_foo);
 } catch (mf::Error error) {
   assert(error == mf::Error::kInvalidCast);
 }

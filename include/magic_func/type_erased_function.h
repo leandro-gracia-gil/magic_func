@@ -40,7 +40,7 @@ class TypeErasedFunction {
  public:
   // Creates an empty, uninitialized type-erased function.
   // The object has no type yet and can be assigned to any other.
-  // Trying to FunctionCast it to another object will fail.
+  // Trying to function_cast it to another object will fail.
   inline TypeErasedFunction() noexcept;
 
   // Default copy and move constructors.

@@ -211,7 +211,7 @@ class GenericEventQueue {
           // Undo the type erasure and invoke the function with our tuple.
           // This will raise a MagicFunc fatal runtime error if the function
           // type does not match, which should never be the case.
-          auto& f = mf::FunctionCast<FunctionType<FuncPtr>>(type_erased);
+          auto& f = mf::function_cast<FunctionType<FuncPtr>>(type_erased);
           Invoke(f, args_tuple, std::index_sequence_for<Args_...>());
         });
 

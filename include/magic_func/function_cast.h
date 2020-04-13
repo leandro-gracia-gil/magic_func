@@ -45,7 +45,7 @@ namespace mf {
 // provided.
 template <typename T>
 std::enable_if_t<std::is_function<T>::value, Function<T>&>
-FunctionCast(TypeErasedFunction& function) {
+function_cast(TypeErasedFunction& function) {
   MAGIC_FUNC_CHECK(function.type_id() == GetTypeId<T>(), Error::kInvalidCast);
   return static_cast<Function<T>&>(function);
 }
@@ -53,18 +53,18 @@ FunctionCast(TypeErasedFunction& function) {
 // Const version of the above.
 template <typename T>
 std::enable_if_t<std::is_function<T>::value, const Function<T>&>
-FunctionCast(const TypeErasedFunction& function) {
+function_cast(const TypeErasedFunction& function) {
   MAGIC_FUNC_CHECK(function.type_id() == GetTypeId<T>(), Error::kInvalidCast);
   return static_cast<const Function<T>&>(function);
 }
 
 // Casts from a type-erased function to a function when a function pointer type
-// is provided. Allows using the FunctionCast<decltype(func)> syntax.
+// is provided. Allows using the function_cast<decltype(func)> syntax.
 template <typename T>
 std::enable_if_t<
     IsFunctionPointer<T>::value,
     Function<typename FunctionTraits<T>::FunctionType>&>
-FunctionCast(TypeErasedFunction& function) {
+function_cast(TypeErasedFunction& function) {
   using FunctionType = typename FunctionTraits<T>::FunctionType;
   MAGIC_FUNC_CHECK(function.type_id() == GetTypeId<FunctionType>(),
                    Error::kInvalidCast);
@@ -76,7 +76,7 @@ template <typename T>
 std::enable_if_t<
     IsFunctionPointer<T>::value,
     const Function<typename FunctionTraits<T>::FunctionType>&>
-FunctionCast(const TypeErasedFunction& function) {
+function_cast(const TypeErasedFunction& function) {
   using FunctionType = typename FunctionTraits<T>::FunctionType;
   MAGIC_FUNC_CHECK(function.type_id() == GetTypeId<FunctionType>(),
                    Error::kInvalidCast);
@@ -87,7 +87,7 @@ FunctionCast(const TypeErasedFunction& function) {
 // pointer type is provided.
 template <typename T>
 std::enable_if_t<std::is_member_function_pointer<T>::value, MemberFunction<T>&>
-FunctionCast(TypeErasedFunction& function) {
+function_cast(TypeErasedFunction& function) {
   MAGIC_FUNC_CHECK(function.type_id() == GetTypeId<T>(), Error::kInvalidCast);
   return static_cast<MemberFunction<T>&>(function);
 }
@@ -96,7 +96,7 @@ FunctionCast(TypeErasedFunction& function) {
 template <typename T>
 std::enable_if_t<std::is_member_function_pointer<T>::value,
                  const MemberFunction<T>&>
-FunctionCast(const TypeErasedFunction& function) {
+function_cast(const TypeErasedFunction& function) {
   MAGIC_FUNC_CHECK(function.type_id() == GetTypeId<T>(), Error::kInvalidCast);
   return static_cast<const MemberFunction<T>&>(function);
 }
