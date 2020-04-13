@@ -101,10 +101,10 @@ class GenericEventQueue {
 
   GenericEventQueue();
   GenericEventQueue(const GenericEventQueue&) = delete;
-  GenericEventQueue(GenericEventQueue&&) = default;
+  GenericEventQueue(GenericEventQueue&&) = delete;
 
   GenericEventQueue& operator =(const GenericEventQueue&) = delete;
-  GenericEventQueue& operator =(GenericEventQueue&&) = default;
+  GenericEventQueue& operator =(GenericEventQueue&&) = delete;
 
   // Adds a listener for an event function.
   //
