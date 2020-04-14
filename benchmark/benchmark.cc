@@ -21,7 +21,7 @@ static constexpr size_t kNumIterations = 10000000;
 using Clock = std::chrono::high_resolution_clock;
 
 using mf::Function;
-using mf::MakeFunction;
+using mf::make_function;
 using mf::MemberFunction;
 
 void FreeFunction(size_t& value);
@@ -115,7 +115,7 @@ void BenchmarkFunctionLambda() {
   {
     size_t call_count = 0;
     auto lambda = [&]() { ++call_count; };
-    Function<void()> function = MakeFunction(lambda);
+    Function<void()> function = make_function(lambda);
     TestFunction(mean_mf, stdev_mf, function);
   }
   std::cout << "mf::Function " << mean_mf << " " << stdev_mf << std::endl;

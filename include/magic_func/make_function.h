@@ -37,11 +37,11 @@
 
 // Helper macro to create functions that take function addresses as template
 // arguments. Avoids having to write something like
-// MakeFunction<decltype(&Foo::Bar), &Foo::Bar>(&object).
+// make_function<decltype(&Foo::Bar), &Foo::Bar>(&object).
 // Instead, MF_MakeFunction(&Foo::Bar, &object) can be used.
 #ifndef MF_MakeFunction
 #define MF_MakeFunction(x, ...) \
-    mf::MakeFunction<decltype((x)), (x)>(__VA_ARGS__)
+    mf::make_function<decltype((x)), (x)>(__VA_ARGS__)
 #endif
 
 namespace mf {
@@ -59,7 +59,7 @@ namespace mf {
 template <typename FuncPtr, FuncPtr func_ptr>
 std::enable_if_t<IsFunctionPointer<FuncPtr>::value,
                  Function<typename FunctionTraits<FuncPtr>::FunctionType>>
-MakeFunction() {
+make_function() {
   using Result = Function<typename FunctionTraits<FuncPtr>::FunctionType>;
   return Result::template FromFunction<func_ptr>();
 }
@@ -81,7 +81,7 @@ MakeFunction() {
 template <typename FuncPtr, FuncPtr func_ptr>
 std::enable_if_t<std::is_member_function_pointer<FuncPtr>::value,
                  MemberFunction<FuncPtr>>
-MakeFunction() {
+make_function() {
   return MemberFunction<FuncPtr>::template FromMemberFunction<func_ptr>();
 }
 
@@ -104,7 +104,7 @@ template <typename FuncPtr, FuncPtr func_ptr>
 typename std::enable_if<
     std::is_member_function_pointer<FuncPtr>::value,
     Function<typename FunctionTraits<FuncPtr>::FunctionType>>::type
-MakeFunction(typename FunctionTraits<FuncPtr>::Class* object) {
+make_function(typename FunctionTraits<FuncPtr>::Class* object) {
   using Result = Function<typename FunctionTraits<FuncPtr>::FunctionType>;
   using Class = typename FunctionTraits<FuncPtr>::Class;
   return Result::template FromMemberFunction<Class, func_ptr>(object);
@@ -131,7 +131,7 @@ template <typename FuncPtr, FuncPtr func_ptr>
 typename std::enable_if<
     std::is_member_function_pointer<FuncPtr>::value,
     Function<typename FunctionTraits<FuncPtr>::FunctionType>>::type
-MakeFunction(
+make_function(
     const std::shared_ptr<typename FunctionTraits<FuncPtr>::Class>& object) {
   using Result = Function<typename FunctionTraits<FuncPtr>::FunctionType>;
   using Class = typename FunctionTraits<FuncPtr>::Class;
@@ -151,15 +151,15 @@ MakeFunction(
 //
 // Object object;
 // auto shared_object = std::make_shared<Object>();
-// auto function_ref_object = MakeFunction(member_function, &object);
-// auto function_shared_object = MakeFunction(member_function, shared_object);
+// auto function_ref_object = make_function(member_function, &object);
+// auto function_shared_object = make_function(member_function, shared_object);
 template <typename MemberFunctionType, typename ObjectType>
 std::enable_if_t<
     IsMemberFunction<MemberFunctionType>::value,
     Function<typename FunctionTraits<
         typename MemberFunctionType::FunctionPointerType>::FunctionType>>
-MakeFunction(const MemberFunctionType& obj_function, const ObjectType& object) {
-  using Result = decltype(MakeFunction(obj_function, object));
+make_function(const MemberFunctionType& obj_function, const ObjectType& object) {
+  using Result = decltype(make_function(obj_function, object));
   return Result(obj_function, object);
 }
 
@@ -171,11 +171,11 @@ MakeFunction(const MemberFunctionType& obj_function, const ObjectType& object) {
 // reference type.
 //
 // // Example 1:
-// auto function = MakeFunction([](int x) { std::cout << x << std::endl; });
+// auto function = make_function([](int x) { std::cout << x << std::endl; });
 //
 // // Example 2:
 // auto lambda = [](int x) { std::cout << x << std::endl; };
-// auto function = MakeFunction(lambda);
+// auto function = make_function(lambda);
 //
 // WARNING: this method only works if Callable::operator () is not overloaded.
 // If it is, this function simply cannot guess which version should be used and
@@ -190,15 +190,15 @@ MakeFunction(const MemberFunctionType& obj_function, const ObjectType& object) {
 // Callable callable;
 //
 // // This will not work because it cannot guess which which operator to use:
-// auto function = MakeFunction(callable);
+// auto function = make_function(callable);
 //
 // // However, this will work because the function type can disambiguate:
 // Function<void()> function_void = callable;
 // Function<void(int)> function_int = callable;
 template <typename Callable>
 Function<typename FunctionTraits<CallableType<Callable>>::FunctionType>
-MakeFunction(Callable&& callable) {
-  using Result = decltype(MakeFunction(std::forward<Callable>(callable)));
+make_function(Callable&& callable) {
+  using Result = decltype(make_function(std::forward<Callable>(callable)));
   return Result(std::forward<Callable>(callable));
 }
 

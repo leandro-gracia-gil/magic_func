@@ -180,7 +180,7 @@ TEST(Allocator, CallStoredLambda) {
 
     std::vector<mf::Function<void(size_t)>> functions;
     for (size_t j = 0; j < 10; ++j) {
-      functions.push_back(mf::MakeFunction(check_allocation));
+      functions.push_back(mf::make_function(check_allocation));
       functions.back()(sizeof(dummy) * (j+1));
     }
   }

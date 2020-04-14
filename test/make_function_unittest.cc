@@ -59,7 +59,7 @@ TEST(MakeFunction, Lambda) {
       return id;
     };
 
-    auto function = MakeFunction(lambda);
+    auto function = make_function(lambda);
     EXPECT_TRUE((std::is_same<Function<int(bool&, bool&&)>,
                 decltype(function)>::value));
 
@@ -75,7 +75,7 @@ TEST(MakeFunction, Lambda) {
   {
     // Test creating a function from a lambda rvalue reference.
     int id = rand();
-    auto function = MakeFunction([=](bool& called, bool&& value) {
+    auto function = make_function([=](bool& called, bool&& value) {
       called = std::move(value);
       return id;
     });
@@ -101,7 +101,7 @@ TEST(MakeFunction, MemberFunctionAndObject) {
     // Test non-const functions with object pointers.
     int id = rand();
     Object object(id);
-    auto function = MakeFunction(member_function, &object);
+    auto function = make_function(member_function, &object);
     EXPECT_TRUE((std::is_same<Function<int(bool&, bool&&)>,
                 decltype(function)>::value));
     EXPECT_EQ(&object, function.GetObject());
@@ -115,7 +115,7 @@ TEST(MakeFunction, MemberFunctionAndObject) {
     // Test const functions with object pointers.
     int id = rand();
     Object object(id);
-    auto function = MakeFunction(member_function_const, &object);
+    auto function = make_function(member_function_const, &object);
     EXPECT_TRUE((std::is_same<Function<int(bool&, bool&&)>,
                 decltype(function)>::value));
     EXPECT_EQ(&object, function.GetObject());
@@ -129,7 +129,7 @@ TEST(MakeFunction, MemberFunctionAndObject) {
     // Test const functions with const object pointers.
     int id = rand();
     const Object const_object(id);
-    auto function = MakeFunction(member_function_const, &const_object);
+    auto function = make_function(member_function_const, &const_object);
     EXPECT_TRUE((std::is_same<Function<int(bool&, bool&&)>,
                 decltype(function)>::value));
     EXPECT_EQ(&const_object, function.GetObject());
@@ -143,7 +143,7 @@ TEST(MakeFunction, MemberFunctionAndObject) {
     // Test non-const functions with shared object pointers.
     int id = rand();
     auto shared_object = std::make_shared<Object>(id);
-    auto function = MakeFunction(member_function, shared_object);
+    auto function = make_function(member_function, shared_object);
     EXPECT_TRUE((std::is_same<Function<int(bool&, bool&&)>,
                 decltype(function)>::value));
     EXPECT_EQ(shared_object.get(), function.GetObject());
@@ -157,7 +157,7 @@ TEST(MakeFunction, MemberFunctionAndObject) {
     // Test const functions with shared object pointers.
     int id = rand();
     auto shared_object = std::make_shared<Object>(id);
-    auto function = MakeFunction(member_function_const, shared_object);
+    auto function = make_function(member_function_const, shared_object);
     EXPECT_TRUE((std::is_same<Function<int(bool&, bool&&)>,
                 decltype(function)>::value));
     EXPECT_EQ(shared_object.get(), function.GetObject());
@@ -171,7 +171,7 @@ TEST(MakeFunction, MemberFunctionAndObject) {
     // Test const functions with shared const object pointers.
     int id = rand();
     auto shared_const_object = std::make_shared<const Object>(id);
-    auto function = MakeFunction(member_function_const, shared_const_object);
+    auto function = make_function(member_function_const, shared_const_object);
     EXPECT_TRUE((std::is_same<Function<int(bool&, bool&&)>,
                 decltype(function)>::value));
     EXPECT_EQ(shared_const_object.get(), function.GetObject());

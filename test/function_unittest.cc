@@ -175,7 +175,7 @@ TEST(Function, LambdaConvertible) {
   // return types are convertible.
   auto lambda = [](const std::string& str, int i) { return str[i]; };
 
-  EXPECT_TRUE((std::is_same<decltype(MakeFunction(lambda)),
+  EXPECT_TRUE((std::is_same<decltype(make_function(lambda)),
               Function<char(const std::string&, int)>>::value));
 
   {
@@ -197,7 +197,7 @@ TEST(Function, LambdaConvertible) {
 TEST(Function, LambdaMutable) {
   // Create a function for a mutable lambda.
   size_t call_count = 0;
-  auto function = MakeFunction([=]() mutable { return call_count++; });
+  auto function = make_function([=]() mutable { return call_count++; });
 
   // Call it 50 times.
   for (size_t i = 0; i < 50; ++i)

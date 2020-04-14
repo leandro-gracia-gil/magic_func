@@ -31,8 +31,8 @@ MagicFunc has two main classes:
 Both classes derive from **mf::TypeErasedFunction**, which holds all the required information. Type-erased functions can be safely copied and moved but not invoked.
 To cast back to a mf::Function or a mf::MemberFunction, **mf::function_cast** must be used. This performs a fast runtime type check to ensure the cast is valid and raises an error otherwise.
 
- MagicFunc features automatic type deduction for functions that are not overloaded. This can be done by  calling **mf::MakeFunction**, which will return a mf::Function or a mf::MemberFunction object depending on the provided arguments.
-When trying to use mf::MakeFunction with explicit function addresses (not pointers) it's simpler to use the auxiliary macro **MF_MakeFunction**. This macro simplifies the syntax involved in passing the function address as a template argument.
+ MagicFunc features automatic type deduction for functions that are not overloaded. This can be done by  calling **mf::make_function**, which will return a mf::Function or a mf::MemberFunction object depending on the provided arguments.
+When trying to use mf::make_function with explicit function addresses (not pointers) it's simpler to use the auxiliary macro **MF_MakeFunction**. This macro simplifies the syntax involved in passing the function address as a template argument.
 
 See the section below for examples of each use case.
 
@@ -141,7 +141,7 @@ foo_member(42);
 mf::Function<int(int, int)> lambda1 = [](int x, int y) { return x + y; };
 
 // In fact, you can let MagicFunc deduce the type for you.
-auto lambda2 = mf::MakeFunction([](int x, int y) { return x + y; });
+auto lambda2 = mf::make_function([](int x, int y) { return x + y; });
 
 // Not only that, but you can actually have different lambda and function types as long as they are convertible.
 // In particular, function arguments must convert to lambda arguments, and the lambda return type must convert to the function one.
@@ -166,7 +166,7 @@ class Object {
 
 // Let's create functions of different types.
 mf::MemberFunction<decltype(&Object::Foo)> foo_member_func = MF_MakeFunction(&Object::Foo);
-mf::Function<int(int)> foo = mf::MakeFunction(foo_member_func, std::make_shared<Object>());
+mf::Function<int(int)> foo = mf::make_function(foo_member_func, std::make_shared<Object>());
 mf::Function<void(const std::string&)> bar = MF_MakeFunction(&Object::Bar);
 
 // Since all those derive from mf::TypeErasedFunction we can just store them in a vector.
@@ -279,11 +279,11 @@ BarFuncPtr bar_ptr = &Object::Bar;
 auto bar2 = MF_MakeFunction(bar_ptr);
 
 // But you can do this instead.
-auto foo3 = mf::MakeFunction([foo_ptr](int arg) { return (*foo_ptr)(arg); });
+auto foo3 = mf::make_function([foo_ptr](int arg) { return (*foo_ptr)(arg); });
 foo3(42);
 
 Object object;
-auto bar3 = mf::MakeFunction([&object, bar_ptr](int arg) { return (object.*bar_ptr)(arg); });
+auto bar3 = mf::make_function([&object, bar_ptr](int arg) { return (object.*bar_ptr)(arg); });
 bar3(42);
 ```
 
@@ -309,17 +309,17 @@ auto bar1 = std::bind(&Object::Bar, &object, 32, std::placeholders::_1);
 bar1(64);
 
 // With MagicFunc you can do this instead.
-auto foo2 = mf::MakeFunction([](int arg2) { return Foo(32, arg2); });
+auto foo2 = mf::make_function([](int arg2) { return Foo(32, arg2); });
 foo2(64);
 
-auto bar2 = mf::MakeFunction([&object](int arg2) { return object.Bar(32, arg2); });
+auto bar2 = mf::make_function([&object](int arg2) { return object.Bar(32, arg2); });
 bar2(64);
 ```
 
-### When should MF_MakeFunction and mf::MakeFunction be used?
+### When should MF_MakeFunction and mf::make_function be used?
 
 Actually, one uses the other. MF_MakeFunction is just a macro that saves us some syntax ugliness that we would otherwise have trying to pass function pointers as template arguments.
-In general the rule of thumb is: if you are passing a function or member function address directly use the **MF_MakeFunction** macro. Otherwise use **mf::MakeFunction**.
+In general the rule of thumb is: if you are passing a function or member function address directly use the **MF_MakeFunction** macro. Otherwise use **mf::make_function**.
 ```c++
 class Object {
  public:
@@ -330,21 +330,21 @@ Object object;
 
 // These two are equivalent. This is what MF_MakeFunction is saving you to write.
 auto foo1 = MF_MakeFunction(&Object::Foo, &object);  // Returns a mf::Function<void(int)>.
-auto foo2 = mf::MakeFunction<decltype(&Object::Foo), &Object::Foo>(&object);
+auto foo2 = mf::make_function<decltype(&Object::Foo), &Object::Foo>(&object);
 
-// Then, this is what mf::MakeFunction is avoiding you to do manually.
+// Then, this is what mf::make_function is avoiding you to do manually.
 // Keep it simple and just use MF_MakeFunction to avoid this.
 auto foo3 = mf::Function<void(int)>::FromMemberFunction<Object, &Object::Foo>(&object);
 
 // When using a member function address use MF_MakeFunction.
 auto member_function = MF_MakeFunction(&Object::Foo);    // Returns a mf::MemberFunction<decltype(&Object::Foo)>.
 
-// However, when using mf::MemberFunction as an argument use mf::MakeFunction instead.
-auto foo4 = mf::MakeFunction(member_function, &object);  // Returns a mf::Function<void(int)>.
+// However, when using mf::MemberFunction as an argument use mf::make_function instead.
+auto foo4 = mf::make_function(member_function, &object);  // Returns a mf::Function<void(int)>.
 
-// In the case of lambdas and other callables you can use mf::MakeFunction,
+// In the case of lambdas and other callables you can use mf::make_function,
 // but assigning them directly also works if you specify the function type.
-auto bar1 = mf::MakeFunction([](int x, int y) { return x + y; });
+auto bar1 = mf::make_function([](int x, int y) { return x + y; });
 mf::Function<int(int, int)> bar2 = [](int x, int y) { return x + y; };
 ```
 
@@ -383,7 +383,7 @@ mf::SetCustomAllocator(
 
 // This now uses the provided allocator.
 int x;
-auto func = mf::MakeFunction([=](int y) { return x + y; });
+auto func = mf::make_function([=](int y) { return x + y; });
 ```
 
 However, note that allocators are set globally (statically) for all MagicFunc. Any required allocators should be set once before any other MagicFunc use and not changed again. This is because mf::Function objects do not save which allocators they use, as it would imply a noticeable increase in the size of all mf::Function objects. Changing allocators while MagicFunc objects exist can lead to issues like deallocations on incorrect functions.
