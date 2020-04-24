@@ -256,6 +256,7 @@ Yes, mf::Function and mf::MemberFunction cannot take function or member function
 Supporting function and member function pointers is possible, but it would require practices that are non-compliant with the standard (member function pointers cannot be type-erased) and would affect overall performance.
 
 However, it is still possible to use a lambda to achieve the same:
+
 ```c++
 class Object {
  public:
@@ -292,6 +293,7 @@ On the other hand, std::function does not support type erasure. For example, you
 ### Is there a mf::Bind or some alternative to std::bind?
 
 There's no mf::Bind because we consider it's not worth the complexity it brings to the code when a simple lambda can be used instead. Using std::bind can be more error-prone than it seems.
+
 ```c++
 int Foo(int arg1, int arg2);
 
@@ -320,6 +322,7 @@ bar2(64);
 
 Actually, one uses the other. MF_MakeFunction is just a macro that saves us some syntax ugliness that we would otherwise have trying to pass function pointers as template arguments.
 In general the rule of thumb is: if you are passing a function or member function address directly use the **MF_MakeFunction** macro. Otherwise use **mf::make_function**.
+
 ```c++
 class Object {
  public:
@@ -363,6 +366,7 @@ Heap memory is only used when callables and lambdas are involved. This is becaus
 Also, experiments showed that trying to store objects within a mf::TypeErasedFunction performed worse than allocating small amounts of memory in the heap, and had potential alignment issues.
 
 If desired, it is possible to use custom allocators for any heap allocations performed by MagicFunc. To do so, use the SetCustomAllocator function.
+
 ```c++
 // In this example we just map to an allocator object, but you can do your own.
 std::allocator<uint8_t> some_allocator;
