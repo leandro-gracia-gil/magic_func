@@ -45,7 +45,7 @@ class TypeErasedFunction {
 
   // Default copy and move constructors.
   inline TypeErasedFunction(const TypeErasedFunction&) = default;
-  inline TypeErasedFunction(TypeErasedFunction&&) = default;
+  inline TypeErasedFunction(TypeErasedFunction&&);
 
   // Copies another function into the current object.
   //

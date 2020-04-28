@@ -122,9 +122,8 @@ void TypeErasedObject::StorePointer(const T* object) {
   object_ptr_ = const_cast<std::remove_cv_t<T>*>(object);
 }
 
-template <typename T>
-std::enable_if_t<!IsSharedPtr<T>::value>
-TypeErasedObject::StoreObject(T&& object) {
+template <typename T, typename>
+void TypeErasedObject::StoreObject(T&& object) {
   // Delete any previously stored object.
   Reset();
 

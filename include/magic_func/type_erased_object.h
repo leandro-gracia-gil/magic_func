@@ -110,9 +110,8 @@ class TypeErasedObject {
   //
   // Note: this function uses universal references. As such, object can both
   // refer to lvalue and rvalue references and T can be a reference type.
-  template <typename T>
-  std::enable_if_t<!IsSharedPtr<T>::value>
-  StoreObject(T&& object);
+  template <typename T, typename = std::enable_if_t<!IsSharedPtr<T>::value>>
+  void StoreObject(T&& object);
 
   // Special version of StoreObject for shared pointers to objects.
   // Stores a shared_ptr object locally.

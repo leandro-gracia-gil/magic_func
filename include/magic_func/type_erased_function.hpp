@@ -41,6 +41,13 @@ TypeErasedFunction::TypeErasedFunction(TypeId type_id,
     : func_ptr_(func_ptr),
       type_id_(type_id) {}
 
+TypeErasedFunction::TypeErasedFunction(TypeErasedFunction&& function)
+    : func_ptr_(nullptr), type_id_(0) {
+  std::swap(object_, function.object_);
+  std::swap(func_ptr_, function.func_ptr_);
+  std::swap(type_id_, function.type_id_);
+}
+
 TypeErasedFunction& TypeErasedFunction::operator =(
     const TypeErasedFunction& function) {
   if (this == &function)

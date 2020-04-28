@@ -205,11 +205,10 @@ class Function<Return(Args...)> : public TypeErasedFunction {
   // auto const_member_function = MakeFunction(&Object::Bar);
   // Function<void(int)> function_const_1(const_member_function, &object);
   // Function<void(int)> function_const_2(const_member_function, &const_object);
-  template <typename MemberFuncPtr, typename Object>
-  Function(const MemberFunction<MemberFuncPtr>& function, Object* object,
-           std::enable_if_t<std::is_same<FunctionType,
-               typename FunctionTraits<MemberFuncPtr>::FunctionType
-               >::value>* = 0);
+  template <typename MemberFuncPtr, typename Object,
+            typename = std::enable_if_t<std::is_same<FunctionType,
+                typename FunctionTraits<MemberFuncPtr>::FunctionType>::value>>
+  Function(const MemberFunction<MemberFuncPtr>& function, Object* object);
 
   // Creates a new Function that binds a MemberFunction to an object shared
   // pointer. The Function makes a copy of the shared pointer, ensuring the
@@ -231,12 +230,11 @@ class Function<Return(Args...)> : public TypeErasedFunction {
   // auto object_const = std::make_shared<const Object>();
   // Function<void(int)> function_const_1(const_member_function, object);
   // Function<void(int)> function_const_2(const_member_function, const_object);
-  template <typename MemberFuncPtr, typename Object>
+  template <typename MemberFuncPtr, typename Object,
+            typename = std::enable_if_t<std::is_same<FunctionType,
+               typename FunctionTraits<MemberFuncPtr>::FunctionType>::value>>
   Function(const MemberFunction<MemberFuncPtr>& function,
-           const std::shared_ptr<Object>& object,
-           std::enable_if_t<std::is_same<FunctionType,
-               typename FunctionTraits<MemberFuncPtr>::FunctionType
-               >::value>* = 0);
+           const std::shared_ptr<Object>& object);
 
   // Universal reference constructor for callable objects, including lambdas.
   //
@@ -257,11 +255,12 @@ class Function<Return(Args...)> : public TypeErasedFunction {
   //
   // Example:
   // Function<void(int)> function = [](int x) { std::cout << x << std::endl; };
-  template <typename Callable>
-  Function(Callable&& callable,
-           std::enable_if_t<
-               !IsFunction<Callable>::value &&
-               !IsMemberFunction<Callable>::value>* = 0);
+  template <typename Callable,
+            typename = std::enable_if_t<
+                !IsFunction<Callable>::value &&
+                !IsMemberFunction<Callable>::value &&
+                !std::is_base_of<TypeErasedFunction, Callable>::value>>
+  Function(Callable&& callable);
 
   // Universal reference assignment operator for compatible callable objects.
   //
@@ -277,7 +276,11 @@ class Function<Return(Args...)> : public TypeErasedFunction {
   // Example:
   // Function<void(int)> function;
   // function = [](int x) { std::cout << x << std::endl; };
-  template <typename Callable>
+  template <typename Callable,
+            typename = std::enable_if_t<
+                !IsFunction<Callable>::value &&
+                !IsMemberFunction<Callable>::value &&
+                !std::is_base_of<TypeErasedFunction, Callable>::value>>
   Function& operator =(Callable&& callable);
 
   // Assignment to nullptr. Clears the function object.
@@ -302,10 +305,10 @@ class Function<Return(Args...)> : public TypeErasedFunction {
   // Calls a member function with its address as a template argument.
   // Also used by MemberFunction in order to avoid specializing qualified
   // member function pointers in order to get the Args variadic argument pack.
-  template <typename MemberFuncPtr, MemberFuncPtr func_ptr>
-  std::enable_if_t<std::is_member_function_pointer<MemberFuncPtr>::value,
-                   Return>
-  static CallMemberFuncAddress(void* object, Args... args);
+  template <typename MemberFuncPtr, MemberFuncPtr func_ptr,
+            typename = std::enable_if_t<
+                std::is_member_function_pointer<MemberFuncPtr>::value, Return>>
+  Return static CallMemberFuncAddress(void* object, Args... args);
 
   // Calls the appropriate operator () of a callable object.
   template <typename Callable>

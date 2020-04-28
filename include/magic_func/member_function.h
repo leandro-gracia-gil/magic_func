@@ -73,10 +73,10 @@ class MemberFunction : public TypeErasedFunction {
   MemberFunction() noexcept;
 
   // Factory method for member function addresses.
-  template <MemberFuncPtr member_func_ptr>
-  std::enable_if_t<std::is_member_function_pointer<MemberFuncPtr>::value,
-                   MemberFunction<MemberFuncPtr>>
-  static FromMemberFunction() noexcept;
+  template <MemberFuncPtr member_func_ptr,
+            typename = std::enable_if_t<
+                std::is_member_function_pointer<MemberFuncPtr>::value>>
+  static MemberFunction<MemberFuncPtr> FromMemberFunction() noexcept;
 
   // Invokes the function returning its result.
   //

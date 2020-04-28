@@ -1457,3 +1457,59 @@ TEST(Function, StdFunction) {
     EXPECT_EQ(id + a + b, func3(b));
   }
 }
+
+TEST(Function, CopyConstructFunction) {
+  Function<int(int)> func1 = [](int x) { return x + 1; };
+  Function<int(int)> func2(func1);
+  EXPECT_TRUE(func1);
+  EXPECT_TRUE(func2);
+  EXPECT_EQ(func2(3), 4);
+
+  Function<int(int)> func3;
+  Function<int(int)> func4 = func3;
+  EXPECT_FALSE(func3);
+  EXPECT_FALSE(func4);
+}
+
+TEST(Function, MoveConstructFunction) {
+  Function<int(int)> func1 = [](int x) { return x + 1; };
+  Function<int(int)> func2(std::move(func1));
+  EXPECT_FALSE(func1);
+  EXPECT_TRUE(func2);
+  EXPECT_EQ(func2(3), 4);
+
+  Function<int(int)> func3;
+  Function<int(int)> func4 = std::move(func3);
+  EXPECT_FALSE(func3);
+  EXPECT_FALSE(func4);
+}
+
+TEST(Function, CopyAssignFunction) {
+  Function<int(int)> func1 = [](int x) { return x + 1; };
+  Function<int(int)> func2;
+  func2 = func1;
+  EXPECT_TRUE(func1);
+  EXPECT_TRUE(func2);
+  EXPECT_EQ(func2(3), 4);
+
+  Function<int(int)> func3;
+  Function<int(int)> func4;
+  func4 = func3;
+  EXPECT_FALSE(func3);
+  EXPECT_FALSE(func4);
+}
+
+TEST(Function, MoveAssignFunction) {
+  Function<int(int)> func1 = [](int x) { return x + 1; };
+  Function<int(int)> func2;
+  func2 = std::move(func1);
+  EXPECT_FALSE(func1);
+  EXPECT_TRUE(func2);
+  EXPECT_EQ(func2(3), 4);
+
+  Function<int(int)> func3;
+  Function<int(int)> func4;
+  func4 = std::move(func3);
+  EXPECT_FALSE(func3);
+  EXPECT_FALSE(func4);
+}

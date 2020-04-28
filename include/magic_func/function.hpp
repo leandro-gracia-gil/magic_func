@@ -74,12 +74,9 @@ Function<Return(Args...)> Function<Return(Args...)>::FromMemberFunction(
 
 // Constructor for MemberFunction objects bound to an object pointer.
 template <typename Return, typename... Args>
-template <typename MemberFuncPtr, typename Object>
+template <typename MemberFuncPtr, typename Object, typename>
 Function<Return(Args...)>::Function(
-    const MemberFunction<MemberFuncPtr>& member_function, Object* object,
-    std::enable_if_t<std::is_same<FunctionType,
-        typename FunctionTraits<MemberFuncPtr>::FunctionType
-        >::value>*)
+    const MemberFunction<MemberFuncPtr>& member_function, Object* object)
     : TypeErasedFunction(get_type_id<FunctionType>()) {
   // Class is qualified as the member function and Object as the object.
   // This enforces const compatibility and produces more useful build errors.
@@ -91,13 +88,10 @@ Function<Return(Args...)>::Function(
 
 // Constructor for MemberFunction objects bound to an object shared pointer.
 template <typename Return, typename... Args>
-template <typename MemberFuncPtr, typename Object>
+template <typename MemberFuncPtr, typename Object, typename>
 Function<Return(Args...)>::Function(
     const MemberFunction<MemberFuncPtr>& member_function,
-    const std::shared_ptr<Object>& object,
-    std::enable_if_t<std::is_same<FunctionType,
-        typename FunctionTraits<MemberFuncPtr>::FunctionType
-        >::value>*)
+    const std::shared_ptr<Object>& object)
     : TypeErasedFunction(get_type_id<FunctionType>()) {
   // Class is qualified as the member function and Object as the object.
   // This enforces const compatibility and produces more useful build errors.
@@ -110,11 +104,8 @@ Function<Return(Args...)>::Function(
 
 // Constructor for compatible callable objects.
 template <typename Return, typename... Args>
-template <typename Callable>
-Function<Return(Args...)>::Function(
-    Callable&& callable,
-    std::enable_if_t<
-        !IsFunction<Callable>::value && !IsMemberFunction<Callable>::value>*)
+template <typename Callable, typename>
+Function<Return(Args...)>::Function(Callable&& callable)
     : TypeErasedFunction(
         get_type_id<FunctionType>(),
         reinterpret_cast<TypeErasedFuncPtr>(&CallCallable<Callable>)) {
@@ -130,7 +121,7 @@ Function<Return(Args...)>::Function(TypeErasedFuncPtr func_ptr) noexcept
 
 // Assignment operator for compatible callable objects.
 template <typename Return, typename... Args>
-template <typename Callable>
+template <typename Callable, typename>
 Function<Return(Args...)>& Function<Return(Args...)>::operator =(
     Callable&& callable) {
   using T = std::remove_reference_t<Callable>;
@@ -169,9 +160,9 @@ Return Function<Return(Args...)>::CallFunctionAddress(void*, Args... args) {
 // Auxiliary function to recover from type erasure and call a member function
 // address with the provided object.
 template <typename Return, typename... Args>
-template <typename MemberFuncPtr, MemberFuncPtr func_ptr>
-std::enable_if_t<std::is_member_function_pointer<MemberFuncPtr>::value, Return>
-Function<Return(Args...)>::CallMemberFuncAddress(void* object, Args... args) {
+template <typename MemberFuncPtr, MemberFuncPtr func_ptr, typename>
+Return Function<Return(Args...)>::CallMemberFuncAddress(
+    void* object, Args... args) {
   MAGIC_FUNC_DCHECK(object, Error::kInvalidObject);
   using Class = typename FunctionTraits<MemberFuncPtr>::Class;
   return (reinterpret_cast<Class*>(object)->*func_ptr)(

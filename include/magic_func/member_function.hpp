@@ -47,9 +47,8 @@ MemberFunction<MemberFuncPtr>::MemberFunction(
     : TypeErasedFunction(get_type_id<MemberFuncPtr>(), member_func_ptr) {}
 
 template <typename MemberFuncPtr>
-template <MemberFuncPtr member_func_ptr>
-std::enable_if_t<std::is_member_function_pointer<MemberFuncPtr>::value,
-                 MemberFunction<MemberFuncPtr>>
+template <MemberFuncPtr member_func_ptr, typename>
+MemberFunction<MemberFuncPtr>
 MemberFunction<MemberFuncPtr>::FromMemberFunction() noexcept {
   // We use the function type here to avoid having to deduce the argument pack
   // types from MemberFuncPtr. If we do, we also have to specialize for all
