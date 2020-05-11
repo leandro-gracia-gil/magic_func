@@ -32,7 +32,7 @@
 
 namespace mf {
 
-TypeErasedObject::TypeErasedObject() noexcept
+TypeErasedObject::TypeErasedObject() MF_NOEXCEPT
     : object_ptr_(nullptr),
       destructor_(nullptr),
       copy_constructor_(nullptr),
@@ -48,7 +48,7 @@ TypeErasedObject::TypeErasedObject(const TypeErasedObject& object)
       object.object_ptr_;
 }
 
-TypeErasedObject::TypeErasedObject(TypeErasedObject&& object) noexcept
+TypeErasedObject::TypeErasedObject(TypeErasedObject&& object) MF_NOEXCEPT
     : TypeErasedObject() {
   std::swap(object_ptr_, object.object_ptr_);
   std::swap(destructor_, object.destructor_);

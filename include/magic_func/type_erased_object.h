@@ -34,6 +34,7 @@
 
 #include <magic_func/allocator.h>
 #include <magic_func/error.h>
+#include <magic_func/port.h>
 #include <magic_func/type_traits.h>
 
 namespace mf {
@@ -54,23 +55,23 @@ namespace mf {
 // appropriate despite type erasure. See StoreObject for more details.
 class TypeErasedObject {
  public:
-  inline TypeErasedObject() noexcept;
+  inline TypeErasedObject() MF_NOEXCEPT;
   inline TypeErasedObject(const TypeErasedObject& object);
-  inline TypeErasedObject(TypeErasedObject&& object) noexcept;
+  inline TypeErasedObject(TypeErasedObject&& object) MF_NOEXCEPT;
   inline ~TypeErasedObject();
 
   inline TypeErasedObject& operator =(const TypeErasedObject& object);
   inline TypeErasedObject& operator =(TypeErasedObject&& object);
 
   // Tells if an object is being encapsulatd or referenced.
-  explicit operator bool() const noexcept { return object_ptr_ != nullptr; }
+  explicit operator bool() const MF_NOEXCEPT { return object_ptr_ != nullptr; }
 
   // Tells if an object is currently being stored.
   // This can either mean in the current instance or in the heap.
-  bool HasStoredObject() const noexcept { return destructor_ != nullptr; }
+  bool HasStoredObject() const MF_NOEXCEPT { return destructor_ != nullptr; }
 
   // Returns the referenced or stored object, if any.
-  void* GetObject() const noexcept { return object_ptr_; }
+  void* GetObject() const MF_NOEXCEPT { return object_ptr_; }
 
   // Deletes any stored object and cleans any object references.
   inline void Reset();

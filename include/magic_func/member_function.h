@@ -32,6 +32,7 @@
 
 #include <type_traits>
 
+#include <magic_func/port.h>
 #include <magic_func/type_erased_function.h>
 
 namespace mf {
@@ -70,13 +71,13 @@ class MemberFunction : public TypeErasedFunction {
   };
 
   // Creates an empty typed MemberFunction.
-  MemberFunction() noexcept;
+  MemberFunction() MF_NOEXCEPT;
 
   // Factory method for member function addresses.
   template <MemberFuncPtr member_func_ptr,
             typename = std::enable_if_t<
                 std::is_member_function_pointer<MemberFuncPtr>::value>>
-  static MemberFunction<MemberFuncPtr> FromMemberFunction() noexcept;
+  static MemberFunction<MemberFuncPtr> FromMemberFunction() MF_NOEXCEPT;
 
   // Invokes the function returning its result.
   //
@@ -99,7 +100,7 @@ class MemberFunction : public TypeErasedFunction {
   friend class Function;
 
   explicit MemberFunction(
-      TypeErasedFunction::TypeErasedFuncPtr member_func_ptr) noexcept;
+      TypeErasedFunction::TypeErasedFuncPtr member_func_ptr) MF_NOEXCEPT;
 };
 
 }  // namespace mf

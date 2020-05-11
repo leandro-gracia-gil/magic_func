@@ -35,16 +35,22 @@
 
 namespace mf {
 
+// Does an extra reinterpret cast to void* to avoid MSVC 2015 warnings.
+template <typename T, typename U>
+T reinterpret_func(U&& target) {
+  return reinterpret_cast<T>(reinterpret_cast<void*>(target));
+}
+
 // Default constructor.
 template <typename Return, typename... Args>
-Function<Return(Args...)>::Function() noexcept
+Function<Return(Args...)>::Function() MF_NOEXCEPT
     : TypeErasedFunction(get_type_id<FunctionType>()) {}
 
 // Factory method for function addresses.
 template <typename Return, typename... Args>
 template <Return (*func_ptr)(Args...)>
-Function<Return(Args...)> Function<Return(Args...)>::FromFunction() noexcept {
-  return Function(reinterpret_cast<TypeErasedFuncPtr>(
+Function<Return(Args...)> Function<Return(Args...)>::FromFunction() MF_NOEXCEPT {
+  return Function(reinterpret_func<TypeErasedFuncPtr>(
       &CallFunctionAddress<func_ptr>));
 }
 
@@ -54,7 +60,7 @@ template <typename Object, CopyCV<Return(Args...), Object> Object::*func_ptr>
 Function<Return(Args...)> Function<Return(Args...)>::FromMemberFunction(
     Object* object) {
   MAGIC_FUNC_DCHECK(object, Error::kInvalidObject);
-  auto function = Function(reinterpret_cast<TypeErasedFuncPtr>(
+  auto function = Function(reinterpret_func<TypeErasedFuncPtr>(
       &CallMemberFuncAddress<decltype(func_ptr), func_ptr>));
   function.object_.StorePointer(object);
   return function;
@@ -66,7 +72,7 @@ template <typename Object, CopyCV<Return(Args...), Object> Object::*func_ptr>
 Function<Return(Args...)> Function<Return(Args...)>::FromMemberFunction(
     const std::shared_ptr<Object>& object) {
   MAGIC_FUNC_DCHECK(object, Error::kInvalidObject);
-  auto function = Function(reinterpret_cast<TypeErasedFuncPtr>(
+  auto function = Function(reinterpret_func<TypeErasedFuncPtr>(
       &CallMemberFuncAddress<decltype(func_ptr), func_ptr>));
   function.object_.StoreObject(object);
   return function;
@@ -108,7 +114,7 @@ template <typename Callable, typename>
 Function<Return(Args...)>::Function(Callable&& callable)
     : TypeErasedFunction(
         get_type_id<FunctionType>(),
-        reinterpret_cast<TypeErasedFuncPtr>(&CallCallable<Callable>)) {
+        reinterpret_func<TypeErasedFuncPtr>(&CallCallable<Callable>)) {
   // Store the callable object within the function or owned by it in the heap.
   object_.StoreObject(std::forward<Callable>(callable));
 }
@@ -116,7 +122,7 @@ Function<Return(Args...)>::Function(Callable&& callable)
 // Auxiliary constructor for factory methods based on function addresses and
 // member function addresses bound to objects.
 template <typename Return, typename... Args>
-Function<Return(Args...)>::Function(TypeErasedFuncPtr func_ptr) noexcept
+Function<Return(Args...)>::Function(TypeErasedFuncPtr func_ptr) MF_NOEXCEPT
     : TypeErasedFunction(get_type_id<FunctionType>(), func_ptr) {}
 
 // Assignment operator for compatible callable objects.
@@ -125,7 +131,7 @@ template <typename Callable, typename>
 Function<Return(Args...)>& Function<Return(Args...)>::operator =(
     Callable&& callable) {
   using T = std::remove_reference_t<Callable>;
-  func_ptr_ = reinterpret_cast<TypeErasedFuncPtr>(&CallCallable<Callable>);
+  func_ptr_ = reinterpret_func<TypeErasedFuncPtr>(&CallCallable<Callable>);
   object_.StoreObject(std::forward<Callable>(callable));
   return *this;
 }
@@ -145,7 +151,7 @@ Return Function<Return(Args...)>::operator ()(Args... args) const {
 
   // Invoke whatever helper function is set.
   // Each one will take care of undoing type erasure and calling.
-  return (*reinterpret_cast<Return (*)(void*, Args...)>
+  return (*reinterpret_func<Return (*)(void*, Args...)>
       (func_ptr_))(object_.GetObject(), std::forward<Args>(args)...);
 }
 

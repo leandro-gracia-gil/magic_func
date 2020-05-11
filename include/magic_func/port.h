@@ -1,4 +1,4 @@
-// Copyright (c) 2016, Leandro Graciá Gil
+// Copyright (c) 2020, Leandro Graciá Gil
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -27,44 +27,15 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef MAGIC_FUNC_TYPE_ID_H_
-#define MAGIC_FUNC_TYPE_ID_H_
+#ifndef MAGIC_FUNC_PORT_H_
+#define MAGIC_FUNC_PORT_H_
 
-#include <cstdint>
-
-#include <magic_func/port.h>
-
-namespace mf {
-
-using TypeId = intptr_t;
-
-// Visual Studio applies the linker flags /OPT:ICF by default in Release builds,
-// which merges identical functions into the same address. This makes the usual
-// get_type_id approach to fail because all type ids collapse to the same value.
-//
-// Instead, for Visual Studio Release builds, or if the macro MSC_OPT_NOICF is
-// manually defined by the user, we use an alternative approach where the id
-// comes from the address of a static variable in a template function.
-//
-// Note that neither of these approaches produce ids that should:
-// 1. Be serialized.
-// 2. Be shared across processes.
-// 3. Be used across Windows DLL boundaries.
-//
-#if defined(_MSC_VER) && !defined(_DEBUG) && !defined(MSC_OPT_NOICF)
-template <typename... T>
-TypeId get_type_id() MF_NOEXCEPT {
-  static uint8_t id;
-  return reinterpret_cast<TypeId>(&id);
-}
+// Disable noexcept for platforms where it causes compiler warnings.
+// This is the case of MSVC 2015 if /EHsc is not defined.
+#if defined(MF_DISABLE_NOEXCEPT)
+#define MF_NOEXCEPT
 #else
-template <typename... T>
-constexpr TypeId get_type_id() MF_NOEXCEPT {
-  // The double reinterpret_cast is to workaround a MSVC compiler warning.
-  return reinterpret_cast<TypeId>(reinterpret_cast<void*>(&get_type_id<T...>));
-}
+#define MF_NOEXCEPT noexcept
 #endif
 
-}  // namespace mf
-
-#endif  // MAGIC_FUNC_TYPE_ID_H_
+#endif  // MAGIC_FUNC_PORT_H_

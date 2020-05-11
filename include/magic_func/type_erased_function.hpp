@@ -32,12 +32,12 @@
 
 namespace mf {
 
-TypeErasedFunction::TypeErasedFunction() noexcept
+TypeErasedFunction::TypeErasedFunction() MF_NOEXCEPT
     : func_ptr_(nullptr),
       type_id_(0) {}
 
 TypeErasedFunction::TypeErasedFunction(TypeId type_id,
-                                       TypeErasedFuncPtr func_ptr) noexcept
+                                       TypeErasedFuncPtr func_ptr) MF_NOEXCEPT
     : func_ptr_(func_ptr),
       type_id_(type_id) {}
 

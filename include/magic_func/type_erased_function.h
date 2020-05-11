@@ -30,6 +30,7 @@
 #ifndef MAGIC_FUNC_TYPE_ERASED_FUNCTION_H_
 #define MAGIC_FUNC_TYPE_ERASED_FUNCTION_H_
 
+#include <magic_func/port.h>
 #include <magic_func/type_erased_object.h>
 #include <magic_func/type_id.h>
 
@@ -41,7 +42,7 @@ class TypeErasedFunction {
   // Creates an empty, uninitialized type-erased function.
   // The object has no type yet and can be assigned to any other.
   // Trying to function_cast it to another object will fail.
-  inline TypeErasedFunction() noexcept;
+  inline TypeErasedFunction() MF_NOEXCEPT;
 
   // Default copy and move constructors.
   inline TypeErasedFunction(const TypeErasedFunction&) = default;
@@ -60,13 +61,13 @@ class TypeErasedFunction {
   inline TypeErasedFunction& operator =(TypeErasedFunction&& function);
 
   // Tells if the object point to a valid function or not.
-  explicit operator bool() const noexcept { return func_ptr_ != nullptr; }
+  explicit operator bool() const MF_NOEXCEPT { return func_ptr_ != nullptr; }
 
-  bool operator ==(std::nullptr_t) const noexcept {
+  bool operator ==(std::nullptr_t) const MF_NOEXCEPT {
     return func_ptr_ == nullptr;
   }
 
-  bool operator !=(std::nullptr_t) const noexcept {
+  bool operator !=(std::nullptr_t) const MF_NOEXCEPT {
     return func_ptr_ != nullptr;
   }
 
@@ -74,10 +75,10 @@ class TypeErasedFunction {
   // encapsulating. Type ids can be uninitialized (with a value of 0), but once
   // initialized they cannot change. This prevents from copying or moving two
   // incompatible objects at the type-erased function level.
-  TypeId type_id() const noexcept { return type_id_; }
+  TypeId type_id() const MF_NOEXCEPT { return type_id_; }
 
   // Returns a pointer to the object associated to this function if any.
-  void* GetObject() const noexcept { return object_.GetObject(); }
+  void* GetObject() const MF_NOEXCEPT { return object_.GetObject(); }
 
   // Resets the function.
   inline TypeErasedFunction& operator =(std::nullptr_t);
@@ -88,7 +89,7 @@ class TypeErasedFunction {
 
   // Constructor used by derived types.
   inline TypeErasedFunction(TypeId type_id,
-                            TypeErasedFuncPtr func_ptr = nullptr) noexcept;
+                            TypeErasedFuncPtr func_ptr = nullptr) MF_NOEXCEPT;
 
   // Type-erased version of the object associated with the function, if any.
   // Goes intentionally first because it can have alignment requirements.

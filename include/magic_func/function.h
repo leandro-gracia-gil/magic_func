@@ -33,6 +33,7 @@
 #include <tuple>
 
 #include <magic_func/function_traits.h>
+#include <magic_func/port.h>
 #include <magic_func/type_erased_function.h>
 #include <magic_func/type_traits.h>
 
@@ -59,7 +60,7 @@ class Function<Return(Args...)> : public TypeErasedFunction {
   enum : size_t { kNumArgs = sizeof...(Args) };
 
   // Creates an empty typed Function.
-  Function() noexcept;
+  Function() MF_NOEXCEPT;
 
   // Creates a new Function from the address of a free or static function.
   //
@@ -69,7 +70,7 @@ class Function<Return(Args...)> : public TypeErasedFunction {
   // void Foo(int x);
   // auto function = MF_MakeFunction(&Foo); // Function<void(int)>.
   template <FunctionPointerType func_ptr>
-  static Function FromFunction() noexcept;
+  static Function FromFunction() MF_NOEXCEPT;
 
   // Creates a new Function by binding a member function to an object pointer.
   // The caller must ensure the validity of the provided object pointer at the
@@ -296,7 +297,7 @@ class Function<Return(Args...)> : public TypeErasedFunction {
 
   // Auxiliary constructor used as part of creating Functions from function
   // addresses and member function addresses bound to objects.
-  explicit Function(TypeErasedFuncPtr func_ptr) noexcept;
+  explicit Function(TypeErasedFuncPtr func_ptr) MF_NOEXCEPT;
 
   // Calls a function address provided as a template argument.
   template <FunctionPointerType func_ptr>
@@ -308,7 +309,7 @@ class Function<Return(Args...)> : public TypeErasedFunction {
   template <typename MemberFuncPtr, MemberFuncPtr func_ptr,
             typename = std::enable_if_t<
                 std::is_member_function_pointer<MemberFuncPtr>::value, Return>>
-  Return static CallMemberFuncAddress(void* object, Args... args);
+  static Return CallMemberFuncAddress(void* object, Args... args);
 
   // Calls the appropriate operator () of a callable object.
   template <typename Callable>
