@@ -131,8 +131,8 @@ template <typename Callable, typename>
 Function<Return(Args...)>& Function<Return(Args...)>::operator =(
     Callable&& callable) {
   using T = std::remove_reference_t<Callable>;
-  func_ptr_ = reinterpret_func<TypeErasedFuncPtr>(&CallCallable<Callable>);
-  object_.StoreObject(std::forward<Callable>(callable));
+  func_ptr_ = reinterpret_func<TypeErasedFuncPtr>(&CallCallable<T>);
+  object_.StoreObject(std::forward<T>(callable));
   return *this;
 }
 
