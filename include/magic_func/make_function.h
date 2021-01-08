@@ -42,6 +42,8 @@
 #ifndef MF_MakeFunction
 #define MF_MakeFunction(x, ...) \
     mf::make_function<decltype((x)), (x)>(__VA_ARGS__)
+#define MF_MakeFunctionNoArgs(x) \
+    mf::make_function<decltype((x)), (x)>()
 #endif
 
 namespace mf {
